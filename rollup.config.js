@@ -1,25 +1,27 @@
-import sass from 'rollup-plugin-sass';
-import uglify from 'rollup-plugin-uglify';
+import less from 'rollup-plugin-less';
+import { uglify } from 'rollup-plugin-uglify';
 import merge from 'deepmerge';
+import typescript from 'rollup-plugin-typescript2';
 
 const dev = {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
         name: 'Gantt',
-        file: 'dist/frappe-gantt.js',
+        file: 'dist/gantt.js',
         format: 'iife'
     },
     plugins: [
-        sass({
-            output: 'dist/frappe-gantt.css'
+        typescript(),
+        less({
+            output: 'dist/gantt.css'
         })
     ]
 };
 const prod = merge(dev, {
     output: {
-        file: 'dist/frappe-gantt.min.js'
+        file: 'dist/gantt.min.js'
     },
-    plugins: [uglify()]
+    plugins: [typescript(), uglify()]
 });
 
 export default [dev, prod];
