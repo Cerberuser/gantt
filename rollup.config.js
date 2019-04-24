@@ -21,7 +21,7 @@ const prod = merge(dev, {
     output: {
         file: 'dist/gantt.min.js'
     },
-    plugins: [typescript(), uglify()]
+    plugins: [uglify()]
 });
 
 export default [dev, prod];

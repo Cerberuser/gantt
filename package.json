@@ -24,7 +24,9 @@
     "project management"
   ],
   "author": "Cerberuser <k.bagrov@g.nsu.ru> (https://github.com/cerberuser)",
-  "contributors": ["Faris Ansari"],
+  "contributors": [
+    "Faris Ansari"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cerberuser/typescript-gantt/issues"
@@ -46,6 +48,8 @@
     "ts-jest": "24.0.2",
     "tslib": "1.9.3",
     "tslint": "5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "3.4.5"
   },
   "eslintIgnore": [
