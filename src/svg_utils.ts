@@ -29,16 +29,22 @@ export const $: SVGUtils = (expr, con?) => {
 
 export function createSVG(tag: string, attrs: Record<string, any>) {
     const elem = document.createElementNS('http://www.w3.org/2000/svg', tag) as SVGGraphicsElement;
-    for (const attr in attrs) {
+    Object.keys(attrs).forEach((attr) => {
         if (attr === 'append_to') {
             const parent = attrs.append_to;
             parent.appendChild(elem);
+        } else if (attr === 'children') {
+            elem.append(attrs[attr]);
         } else if (attr === 'innerHTML') {
             elem.innerHTML = attrs.innerHTML;
+        } else if (attr === 'style') {
+            Object.keys(attrs[attr]).forEach((prop) => {
+                elem.style.setProperty(prop, attrs[attr][prop]);
+            });
         } else {
             elem.setAttribute(attr, attrs[attr]);
         }
-    }
+    });
     return elem;
 }
 
@@ -61,7 +67,7 @@ function getAnimationElement(
     from: any,
     to: any,
     dur = '0.4s',
-    begin = '0.1s'
+    begin = '0.1s',
 ) {
     const animEl = svgElement.querySelector('animate');
     if (animEl) {
@@ -70,7 +76,7 @@ function getAnimationElement(
             from,
             to,
             dur,
-            begin: 'click + ' + begin // artificial click
+            begin: 'click + ' + begin, // artificial click
         });
         return svgElement;
     }
@@ -84,7 +90,7 @@ function getAnimationElement(
         calcMode: 'spline',
         values: from + ';' + to,
         keyTimes: '0; 1',
-        keySplines: cubic_bezier('ease-out')
+        keySplines: cubic_bezier('ease-out'),
     });
     svgElement.appendChild(animateElement);
 
@@ -97,7 +103,7 @@ function cubic_bezier(name: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-i
         'linear': '0 0 1 1',
         'ease-in': '.42 0 1 1',
         'ease-out': '0 0 .58 1',
-        'ease-in-out': '.42 0 .58 1'
+        'ease-in-out': '.42 0 .58 1',
     }[name];
 }
 
@@ -135,10 +141,8 @@ $.delegate = (
     });
 };
 
-$.closest = (selector: string, element: Element): Element | null => {
-    if (!element) {
-        return null;
-    }
+$.closest = (selector, element) => {
+    if (!element) return null;
 
     if (element.matches(selector)) {
         return element;

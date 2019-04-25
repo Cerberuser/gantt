@@ -129,6 +129,7 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar',
             append_to: this.bar_group,
+            style: {fill: this.task.color},
         });
 
         animateSVG(this.$bar, 'width', 0, this.width);
@@ -151,6 +152,7 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar-progress',
             append_to: this.bar_group,
+            style: {fill: this.task!.color},
         });
 
         animateSVG(this.$bar_progress, 'width', 0, this.progress_width);
@@ -224,23 +226,35 @@ export default class Bar {
             return;
         }
         this.setup_click_event();
+        this.setup_hover_event();
     }
 
     public setup_click_event() {
-        $.on(this.group!, 'focus ' + this.gantt!.options!.popup_trigger, (e) => {
-            if (this.action_completed) {
-                // just finished a move action, wait for a few seconds
-                return;
-            }
+        if (this.gantt.options.click_trigger) {
+            $.on(this.group!, 'focus ' + this.gantt!.options!.popup_trigger, (e) => {
+                if (this.action_completed) {
+                    // just finished a move action, wait for a few seconds
+                    return;
+                }
 
-            if (e.type === 'click') {
-                this.gantt!.trigger_event('click', [this.task!]);
-            }
+                if (e.type === 'click') {
+                    this.gantt!.trigger_event('click', [this.task!]);
+                }
 
-            this.gantt!.unselect_all();
-            this.group!.classList.toggle('active');
+                this.gantt!.unselect_all();
+                this.group!.classList.toggle('active');
 
+                this.show_popup();
+            });
+        }
+    }
+
+    public setup_hover_event() {
+        $.on(this.group, 'mouseover ' + this.gantt.options.popup_trigger, () => {
             this.show_popup();
+        });
+        $.on(this.group, 'mouseout ' + this.gantt.options.popup_trigger, () => {
+            this.gantt.hide_popup();
         });
     }
 
@@ -254,7 +268,7 @@ export default class Bar {
             date_utils.add(this.task!._end, -1, 'second'),
             'MMM D',
         );
-        const subtitle = start_date + ' - ' + end_date;
+        const subtitle = start_date + ' - ' + end_date + (this.task.custom_data ? '<br>' + this.task.custom_data : '');
 
         this.gantt!.show_popup({
             target_element: this.$bar!,
@@ -265,7 +279,6 @@ export default class Bar {
     }
 
     public update_bar_position({x = undefined, width = undefined}: { x?: number, width?: number }) {
-        const bar = this.$bar!;
         if (x) {
             // get all x values of parent task
             const xs = this.task!.dependencies.map((dep) => {
@@ -279,10 +292,10 @@ export default class Bar {
                 width = undefined;
                 return;
             }
-            this.update_attr(bar, 'x', x);
+            this.update_attr('x', x);
         }
         if (width && width >= this.gantt!.options!.column_width) {
-            this.update_attr(bar, 'width', width);
+            this.update_attr('width', width);
         }
         this.update_label_position();
         this.update_handle_position();
@@ -406,12 +419,12 @@ export default class Bar {
         return position;
     }
 
-    public update_attr(element: Element, attr: any, value: any) {
+    public update_attr(attr: string, value: any) {
         value = +value;
         if (!isNaN(value)) {
-            element.setAttribute(attr, value);
+            this.$bar!.setAttribute(attr, value);
         }
-        return element;
+        return this.$bar;
     }
 
     public update_progressbar_position() {
@@ -428,7 +441,12 @@ export default class Bar {
 
         if (label.getBBox().width > bar.getWidth()) {
             label.classList.add('big');
-            label.setAttribute('x', bar.getX() + bar.getWidth() + 5 as any);
+            // TODO: is this ever optimal?
+            let s = label.innerHTML;
+            while (s.length > 0 && label.getBBox().width > bar.getWidth()) {
+                s = s.slice(0, -1);
+            }
+            label.innerHTML = s + '...';
         } else {
             label.classList.remove('big');
             label.setAttribute('x', bar.getX() + bar.getWidth() / 2 as any);

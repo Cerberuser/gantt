@@ -5,21 +5,27 @@ import Arrow from './arrow';
 import Bar from './bar';
 import date_utils from './date_utils';
 import Popup, { IPopupOptions } from './popup';
-import { $, createSVG } from './svg_utils';
+import {
+    $,
+    createSVG,
+} from './svg_utils';
 
 import './gantt.less';
 
 export interface ITask {
     id: string;
     name: string;
-    start: Date | string | null;
-    end: Date | string | null;
+    start: Date | string;
+    end: Date | string;
     progress?: number;
     dependencies?: string;
     custom_class?: string;
+    group?: string;
+    custom_data?: string;
 }
 
 export interface ITaskInternal extends Pick<ITask, Exclude<keyof ITask, 'dependencies'>> {
+    color?: string;
     _start: Date;
     _end: Date;
     _index: number;
@@ -37,6 +43,9 @@ export const enum ViewMode {
 }
 
 export interface IOptions {
+    auto_scroll: boolean;
+    click_trigger: boolean;
+    interactive: boolean;
     header_height: number;
     column_width: number;
     step: number;
@@ -51,6 +60,21 @@ export interface IOptions {
     custom_popup_html: ((task: ITaskInternal) => string) | null;
     language: 'en' | 'ru' | 'ptBr';
 }
+
+const colors = [
+    '#60bbe4',
+    '#b7d95f',
+    '#f9c26b',
+    '#8ed4fd',
+    '#d898ca',
+    '#f1d154',
+    '#94b9c5',
+    '#ccc5a9',
+    '#57bbcb',
+    '#dbda52',
+    '#99abf9',
+];
+const getColor = (index: number) => colors[index % colors.length];
 
 export class Gantt {
     public options: IOptions | null = null;
@@ -67,6 +91,7 @@ export class Gantt {
     private bars: Bar[] | null = null;
     private arrows: Arrow[] | null = null;
     private popup: Popup | null = null;
+    private groups: Record<string, { color: string }> | null = null;
 
     constructor(wrapper: Element, tasks: ITask[], options: Partial<IOptions>) {
         this.setup_wrapper(wrapper);
@@ -105,7 +130,7 @@ export class Gantt {
             // create it
             this.$svg = createSVG('svg', {
                 append_to: wrapper_element,
-                class: 'gantt'
+                class: 'gantt',
             });
         } else {
             this.$svg = svg_element;
@@ -128,6 +153,9 @@ export class Gantt {
 
     public setup_options(options: Partial<IOptions>) {
         const default_options: IOptions = {
+            auto_scroll: false,
+            click_trigger: false,
+            interactive: false,
             header_height: 50,
             column_width: 30,
             step: 24,
@@ -147,7 +175,7 @@ export class Gantt {
             date_format: 'YYYY-MM-DD',
             popup_trigger: 'click',
             custom_popup_html: null,
-            language: 'en'
+            language: 'en',
         };
         this.options = Object.assign({}, default_options, options);
     }
@@ -216,6 +244,7 @@ export class Gantt {
         });
 
         this.setup_dependencies();
+        this.setup_groups();
     }
 
     public setup_dependencies() {
@@ -226,6 +255,17 @@ export class Gantt {
                 this.dependency_map[d].push(t.id);
             }
         }
+    }
+
+    public setup_groups() {
+        this.groups = {};
+        let groupsCount = 0;
+        this.tasks.forEach((task) => {
+            if (!this.groups[task.group]) {
+                groupsCount++;
+                this.groups[task.group] = {color: getColor(groupsCount)};
+            }
+        });
     }
 
     public refresh(tasks: ITask[]) {
@@ -309,7 +349,11 @@ export class Gantt {
         this.dates = [];
         let cur_date = null;
 
-        while (cur_date === null || cur_date < this.gantt_end!) {
+        while (
+            cur_date === null ||
+            cur_date < this.gantt_end ||
+            this.dates.length * this.options.column_width + 150 < this.$container.offsetWidth
+            ) {
             if (!cur_date) {
                 cur_date = date_utils.clone(this.gantt_start!);
             } else {
@@ -321,7 +365,7 @@ export class Gantt {
                     cur_date = date_utils.add(
                         cur_date,
                         this.options!.step,
-                        'hour'
+                        'hour',
                     );
                 }
             }
@@ -353,7 +397,7 @@ export class Gantt {
         for (const layer of layers) {
             this.layers[layer] = createSVG('g', {
                 class: layer,
-                append_to: this.$svg
+                append_to: this.$svg,
             });
         }
     }
@@ -364,61 +408,59 @@ export class Gantt {
         this.make_grid_header();
         this.make_grid_ticks();
         this.make_grid_highlights();
+        this.make_legend();
     }
 
     public make_grid_background() {
-        const grid_width = this.dates!.length * this.options!.column_width;
-        const grid_height =
-            this.options!.header_height +
-            this.options!.padding +
-            (this.options!.bar_height + this.options!.padding) *
-            this.tasks!.length;
-
+        const rect = {
+            height: this.options!.header_height +
+                this.options!.padding +
+                (this.options!.bar_height + this.options!.padding) *
+                this.tasks!.length,
+            width: this.dates!.length * this.options!.column_width + 150,
+        };
         createSVG('rect', {
             x: 0,
             y: 0,
-            width: grid_width,
-            height: grid_height,
+            ...rect,
             class: 'grid-background',
-            append_to: this.layers!.grid
+            append_to: this.layers!.grid,
         });
-
-        $.attr(this.$svg!, {
-            height: grid_height + this.options!.padding + 100,
-            width: '100%'
-        });
+        $.attr(this.$svg!, rect);
     }
 
     public make_grid_rows() {
-        const rows_layer = createSVG('g', { append_to: this.layers!.grid });
-        const lines_layer = createSVG('g', { append_to: this.layers!.grid });
+        const rows_layer = createSVG('g', {append_to: this.layers!.grid});
+        const lines_layer = createSVG('g', {append_to: this.layers!.grid});
 
         const row_width = this.dates!.length * this.options!.column_width;
         const row_height = this.options!.bar_height + this.options!.padding;
 
         let row_y = this.options!.header_height + this.options!.padding / 2;
 
-        for (const _ of this.tasks!) {
+        this.tasks.forEach((task) => {
             createSVG('rect', {
-                x: 0,
+                x: 150,
                 y: row_y,
                 width: row_width,
                 height: row_height,
                 class: 'grid-row',
-                append_to: rows_layer
+                append_to: rows_layer,
+                style: {fill: this.groups![task.group!].color},
             });
 
             createSVG('line', {
-                x1: 0,
+                x1: 150,
                 y1: row_y + row_height,
                 x2: row_width,
                 y2: row_y + row_height,
-                class: 'row-line',
-                append_to: lines_layer
+                class: 'grid-row-line',
+                append_to: lines_layer,
+                style: {stroke: this.groups![task.group!].color},
             });
 
             row_y += this.options!.bar_height + this.options!.padding;
-        }
+        });
     }
 
     public make_grid_header() {
@@ -427,10 +469,39 @@ export class Gantt {
         createSVG('rect', {
             x: 0,
             y: 0,
-            width: header_width,
+            width: header_width + 150,
             height: header_height,
             class: 'grid-header',
-            append_to: this.layers!.grid
+            append_to: this.layers!.grid,
+        });
+    }
+
+    public make_legend() {
+        const legend_height = this.options.bar_height + this.options.padding;
+        const common_attrs = {
+            x: 0,
+            y: 60,
+            width: 150,
+            append_to: this.layers.grid,
+        };
+        Array.from(new Set(this.tasks.map((t) => t.group))).forEach((group, i) => {
+            const height = this.tasks.filter((t) => t.group === group).length * legend_height;
+            createSVG('rect', {
+                ...common_attrs,
+                height,
+                fill: this.groups[group].color,
+            });
+            const child = document.createElement('div');
+            child.className = 'legend';
+            const span = document.createElement('span');
+            child.appendChild(span);
+            span.innerText = group;
+            createSVG('foreignObject', {
+                ...common_attrs,
+                height,
+                children: child,
+            });
+            common_attrs.y += height;
         });
     }
 
@@ -463,7 +534,7 @@ export class Gantt {
             createSVG('path', {
                 d: `M ${tick_x} ${tick_y} v ${tick_height}`,
                 class: tick_class,
-                append_to: this.layers!.grid
+                append_to: this.layers!.grid,
             });
 
             if (this.view_is('Month')) {
@@ -499,7 +570,7 @@ export class Gantt {
                 width,
                 height,
                 class: 'today-highlight',
-                append_to: this.layers!.grid
+                append_to: this.layers!.grid,
             });
         }
     }
@@ -507,11 +578,11 @@ export class Gantt {
     public make_dates() {
         for (const date of this.get_dates_to_draw()) {
             createSVG('text', {
-                x: date.lower_x,
+                x: date.lower_x + 150,
                 y: date.lower_y,
                 innerHTML: date.lower_text,
                 class: 'lower-text',
-                append_to: this.layers!.date
+                append_to: this.layers!.date,
             });
 
             if (date.upper_text) {
@@ -520,7 +591,7 @@ export class Gantt {
                     y: date.upper_y,
                     innerHTML: date.upper_text,
                     class: 'upper-text',
-                    append_to: this.layers!.date
+                    append_to: this.layers!.date,
                 });
 
                 // remove out-of-bound dates
@@ -551,12 +622,12 @@ export class Gantt {
             'Quarter Day_lower': date_utils.format(
                 date,
                 'HH',
-                this.options!.language
+                this.options!.language,
             ),
             'Half Day_lower': date_utils.format(
                 date,
                 'HH',
-                this.options!.language
+                this.options!.language,
             ),
             'Day_lower':
                 date.getDate() !== last_date.getDate()
@@ -593,13 +664,13 @@ export class Gantt {
             'Year_upper':
                 date.getFullYear() !== last_date.getFullYear()
                     ? date_utils.format(date, 'YYYY', this.options!.language)
-                    : ''
+                    : '',
         };
 
         const base_pos = {
             x: i * this.options!.column_width,
             lower_y: this.options!.header_height,
-            upper_y: this.options!.header_height - 25
+            upper_y: this.options!.header_height - 25,
         };
 
         const x_pos: any = {
@@ -614,7 +685,7 @@ export class Gantt {
             'Month_lower': this.options!.column_width / 2,
             'Month_upper': this.options!.column_width * 12 / 2,
             'Year_lower': this.options!.column_width / 2,
-            'Year_upper': this.options!.column_width * 30 / 2
+            'Year_upper': this.options!.column_width * 30 / 2,
         };
 
         return {
@@ -623,12 +694,13 @@ export class Gantt {
             upper_x: base_pos.x + x_pos[`${this.options!.view_mode}_upper`],
             upper_y: base_pos.upper_y,
             lower_x: base_pos.x + x_pos[`${this.options!.view_mode}_lower`],
-            lower_y: base_pos.lower_y
+            lower_y: base_pos.lower_y,
         };
     }
 
     public make_bars() {
         this.bars = this.tasks!.map((task) => {
+            task.color = this.groups[task.group].color;
             const bar = new Bar(this, task);
             this.layers!.bar.appendChild(bar.group!);
             return bar;
@@ -648,7 +720,7 @@ export class Gantt {
                     const arrow = new Arrow(
                         this,
                         this.bars![dependency._index], // from_task
-                        this.bars![task._index] // to_task
+                        this.bars![task._index], // to_task
                     );
                     this.layers!.arrow.appendChild(arrow.element!);
                     return arrow;
@@ -680,6 +752,9 @@ export class Gantt {
     }
 
     public set_scroll_position() {
+        if (!this.options.auto_scroll) {
+            return;
+        }
         const parent_element = this.$svg!.parentElement;
         if (!parent_element) {
             return;
@@ -688,7 +763,7 @@ export class Gantt {
         const hours_before_first_task = date_utils.diff(
             this.get_oldest_starting_date(),
             this.gantt_start,
-            'hour'
+            'hour',
         );
 
         const scroll_pos =
@@ -708,12 +783,15 @@ export class Gantt {
             () => {
                 this.unselect_all();
                 this.hide_popup();
-            }
+            },
         );
     }
 
     public bind_bar_events() {
         let is_dragging = false;
+        if (!this.options.interactive) {
+            return;
+        }
         let x_on_start = 0;
         let is_resizing_left = false;
         let is_resizing_right = false;
@@ -743,7 +821,7 @@ export class Gantt {
             parent_bar_id = bar_wrapper.getAttribute('data-id')!;
             const ids = [
                 parent_bar_id,
-                ...this.get_all_dependent_tasks(parent_bar_id)
+                ...this.get_all_dependent_tasks(parent_bar_id),
             ];
             bars = ids.map((id) => this.get_bar(id));
 
@@ -772,21 +850,21 @@ export class Gantt {
                     if (parent_bar_id === bar.task!.id) {
                         bar.update_bar_position({
                             x: $bar.ox + $bar.finaldx,
-                            width: $bar.owidth - $bar.finaldx
+                            width: $bar.owidth - $bar.finaldx,
                         });
                     } else {
                         bar.update_bar_position({
-                            x: $bar.ox + $bar.finaldx
+                            x: $bar.ox + $bar.finaldx,
                         });
                     }
                 } else if (is_resizing_right) {
                     if (parent_bar_id === bar.task!.id) {
                         bar.update_bar_position({
-                            width: $bar.owidth + $bar.finaldx
+                            width: $bar.owidth + $bar.finaldx,
                         });
                     }
                 } else if (is_dragging) {
-                    bar.update_bar_position({ x: $bar.ox + $bar.finaldx });
+                    bar.update_bar_position({x: $bar.ox + $bar.finaldx});
                 }
             });
         });
@@ -981,7 +1059,7 @@ export class Gantt {
             .map((task) => task._start)
             .reduce(
                 (prev_date, cur_date) =>
-                    cur_date <= prev_date ? cur_date : prev_date
+                    cur_date <= prev_date ? cur_date : prev_date,
             );
     }
 

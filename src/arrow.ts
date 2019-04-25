@@ -94,6 +94,7 @@ export default class Arrow {
 
     public draw() {
         this.element = createSVG('path', {
+            'className': 'arrow',
             'd': this.path,
             'data-from': this.from_task.task!.id,
             'data-to': this.to_task.task!.id,
