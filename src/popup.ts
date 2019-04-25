@@ -1,11 +1,30 @@
+// tslint:disable:variable-name
+// tslint:disable:object-literal-sort-keys
+
+import { ITaskInternal } from './index';
+
+export interface IPopupOptions {
+    target_element: SVGGraphicsElement;
+    position: string;
+    task: ITaskInternal;
+    title: string;
+    subtitle: string;
+}
+
 export default class Popup {
-    constructor(parent, custom_html) {
+    private parent: Element & ElementCSSInlineStyle;
+    private custom_html: (task: ITaskInternal) => string;
+    private title: Element;
+    private subtitle: Element;
+    private pointer: Element & ElementCSSInlineStyle;
+
+    constructor(parent: Element & ElementCSSInlineStyle, custom_html: (task: ITaskInternal) => string) {
         this.parent = parent;
         this.custom_html = custom_html;
         this.make();
     }
 
-    make() {
+    public make() {
         this.parent.innerHTML = `
             <div class="title"></div>
             <div class="subtitle"></div>
@@ -19,7 +38,7 @@ export default class Popup {
         this.pointer = this.parent.querySelector('.pointer');
     }
 
-    show(options) {
+    public show(options: Partial<IPopupOptions>) {
         if (!options.target_element) {
             throw new Error('target_element is required to show popup');
         }
@@ -43,15 +62,19 @@ export default class Popup {
         // set position
         let position_meta;
         if (target_element instanceof HTMLElement) {
-            position_meta = target_element.getBoundingClientRect();
+            position_meta = target_element.getBoundingClientRect() as DOMRect;
         } else if (target_element instanceof SVGElement) {
             position_meta = options.target_element.getBBox();
         }
 
         if (options.position === 'left') {
-            this.parent.style.left =
-                position_meta.x + (position_meta.width + 10) + 'px';
-            this.parent.style.top = position_meta.y + 'px';
+            const parentHeight = this.parent.clientHeight + 10;
+            this.parent.style.left = position_meta.x + 'px';
+            if (position_meta.y < parentHeight) {
+                this.parent.style.top = position_meta.y + 50 + 'px';
+            } else {
+                this.parent.style.top = position_meta.y - parentHeight + 'px';
+            }
 
             this.pointer.style.transform = 'rotateZ(90deg)';
             this.pointer.style.left = '-7px';
@@ -59,10 +82,10 @@ export default class Popup {
         }
 
         // show
-        this.parent.style.opacity = 1;
+        this.parent.style.opacity = 1 as any;
     }
 
-    hide() {
-        this.parent.style.opacity = 0;
+    public hide() {
+        this.parent.style.opacity = 0 as any;
     }
 }

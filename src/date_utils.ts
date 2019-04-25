@@ -1,3 +1,7 @@
+// tslint:disable:variable-name
+// tslint:disable:class-name
+// tslint:disable:object-literal-sort-keys
+
 const YEAR = 'year';
 const MONTH = 'month';
 const DAY = 'day';
@@ -19,7 +23,7 @@ const month_names = {
         'September',
         'October',
         'November',
-        'December'
+        'December',
     ],
     ru: [
         'Январь',
@@ -33,7 +37,7 @@ const month_names = {
         'Сентябрь',
         'Октябрь',
         'Ноябрь',
-        'Декабрь'
+        'Декабрь',
     ],
     ptBr: [
         'Janeiro',
@@ -47,22 +51,26 @@ const month_names = {
         'Setembro',
         'Outubro',
         'Novembro',
-        'Dezembro'
-    ]
+        'Dezembro',
+    ],
 };
 
-export default {
-    parse(date, date_separator = '-', time_separator = /[.:]/) {
+type DateInput = [any, any, any, any, any, any, any];
+
+class date_utils {
+
+    public parse(date: Date | string, date_separator = '-', time_separator = /[.:]/) {
         if (date instanceof Date) {
             return date;
         }
         if (typeof date === 'string') {
-            let date_parts, time_parts;
+            let date_parts: any[];
+            let time_parts: any[];
             const parts = date.split(' ');
 
             date_parts = parts[0]
                 .split(date_separator)
-                .map(val => parseInt(val, 10));
+                .map((val) => parseInt(val, 10));
             time_parts = parts[1] && parts[1].split(time_separator);
 
             // month is 0 indexed
@@ -71,18 +79,18 @@ export default {
             let vals = date_parts;
 
             if (time_parts && time_parts.length) {
-                if (time_parts.length == 4) {
+                if (time_parts.length === 4) {
                     time_parts[3] = '0.' + time_parts[3];
                     time_parts[3] = parseFloat(time_parts[3]) * 1000;
                 }
                 vals = vals.concat(time_parts);
             }
 
-            return new Date(...vals);
+            return new Date(...vals as DateInput);
         }
-    },
+    }
 
-    to_string(date, with_time = false) {
+    public to_string(date: Date, with_time = false) {
         if (!(date instanceof Date)) {
             throw new TypeError('Invalid argument type');
         }
@@ -102,10 +110,10 @@ export default {
         const time_string = `${vals[3]}:${vals[4]}:${vals[5]}.${vals[6]}`;
 
         return date_string + (with_time ? ' ' + time_string : '');
-    },
+    }
 
-    format(date, format_string = 'YYYY-MM-DD HH:mm:ss.SSS', lang = 'en') {
-        const values = this.get_date_values(date).map(d => padStart(d, 2, 0));
+    public format(date: Date, format_string = 'YYYY-MM-DD HH:mm:ss.SSS', lang: 'en' | 'ru' | 'ptBr' = 'en') {
+        const values = this.get_date_values(date).map((d) => padStart(d, 2, 0));
         const format_map = {
             YYYY: values[0],
             MM: padStart(+values[1] + 1, 2, 0),
@@ -113,18 +121,18 @@ export default {
             HH: values[3],
             mm: values[4],
             ss: values[5],
-            SSS:values[6],
+            SSS: values[6],
             D: values[2],
             MMMM: month_names[lang][+values[1]],
-            MMM: month_names[lang][+values[1]]
+            MMM: month_names[lang][+values[1]],
         };
 
         let str = format_string;
-        const formatted_values = [];
+        const formatted_values: any[] = [];
 
         Object.keys(format_map)
             .sort((a, b) => b.length - a.length) // big string first
-            .forEach(key => {
+            .forEach((key) => {
                 if (str.includes(key)) {
                     str = str.replace(key, `$${formatted_values.length}`);
                     formatted_values.push(format_map[key]);
@@ -136,10 +144,16 @@ export default {
         });
 
         return str;
-    },
+    }
 
-    diff(date_a, date_b, scale = DAY) {
-        let milliseconds, seconds, hours, minutes, days, months, years;
+    public diff(date_a: any, date_b: any, scale = DAY) {
+        let milliseconds;
+        let seconds;
+        let hours;
+        let minutes;
+        let days;
+        let months;
+        let years;
 
         milliseconds = date_a - date_b;
         seconds = milliseconds / 1000;
@@ -154,28 +168,28 @@ export default {
         }
 
         return Math.floor(
-            {
+            ({
                 milliseconds,
                 seconds,
                 minutes,
                 hours,
                 days,
                 months,
-                years
-            }[scale]
+                years,
+            } as any)[scale],
         );
-    },
+    }
 
-    today() {
+    public today() {
         const vals = this.get_date_values(new Date()).slice(0, 3);
-        return new Date(...vals);
-    },
+        return new Date(...vals as [any, any, any]);
+    }
 
-    now() {
+    public now() {
         return new Date();
-    },
+    }
 
-    add(date, qty, scale) {
+    public add(date: Date, qty: any, scale: string) {
         qty = parseInt(qty, 10);
         const vals = [
             date.getFullYear() + (scale === YEAR ? qty : 0),
@@ -184,23 +198,23 @@ export default {
             date.getHours() + (scale === HOUR ? qty : 0),
             date.getMinutes() + (scale === MINUTE ? qty : 0),
             date.getSeconds() + (scale === SECOND ? qty : 0),
-            date.getMilliseconds() + (scale === MILLISECOND ? qty : 0)
+            date.getMilliseconds() + (scale === MILLISECOND ? qty : 0),
         ];
-        return new Date(...vals);
-    },
+        return new Date(...vals as DateInput);
+    }
 
-    start_of(date, scale) {
-        const scores = {
+    public start_of(date: Date, scale: string) {
+        const scores: any = {
             [YEAR]: 6,
             [MONTH]: 5,
             [DAY]: 4,
             [HOUR]: 3,
             [MINUTE]: 2,
             [SECOND]: 1,
-            [MILLISECOND]: 0
+            [MILLISECOND]: 0,
         };
 
-        function should_reset(_scale) {
+        function should_reset(_scale: string) {
             const max_score = scores[scale];
             return scores[_scale] <= max_score;
         }
@@ -212,17 +226,17 @@ export default {
             should_reset(DAY) ? 0 : date.getHours(),
             should_reset(HOUR) ? 0 : date.getMinutes(),
             should_reset(MINUTE) ? 0 : date.getSeconds(),
-            should_reset(SECOND) ? 0 : date.getMilliseconds()
+            should_reset(SECOND) ? 0 : date.getMilliseconds(),
         ];
 
-        return new Date(...vals);
-    },
+        return new Date(...vals as DateInput);
+    }
 
-    clone(date) {
+    public clone(date: Date) {
         return new Date(...this.get_date_values(date));
-    },
+    }
 
-    get_date_values(date) {
+    public get_date_values(date: Date): [number, number, number, number, number, number, number] {
         return [
             date.getFullYear(),
             date.getMonth(),
@@ -230,11 +244,11 @@ export default {
             date.getHours(),
             date.getMinutes(),
             date.getSeconds(),
-            date.getMilliseconds()
+            date.getMilliseconds(),
         ];
-    },
+    }
 
-    get_days_in_month(date) {
+    public get_days_in_month(date: Date) {
         const no_of_days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
         const month = date.getMonth();
@@ -245,16 +259,17 @@ export default {
 
         // Feb
         const year = date.getFullYear();
-        if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+        if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
             return 29;
         }
         return 28;
     }
-};
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
-function padStart(str, targetLength, padString) {
+function padStart(str: number | string, targetLength: number, padString: number | string) {
     str = str + '';
+    // tslint:disable:no-bitwise
     targetLength = targetLength >> 0;
     padString = String(typeof padString !== 'undefined' ? padString : ' ');
     if (str.length > targetLength) {
@@ -267,3 +282,6 @@ function padStart(str, targetLength, padString) {
         return padString.slice(0, targetLength) + String(str);
     }
 }
+
+const utils = new date_utils();
+export default utils;

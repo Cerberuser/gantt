@@ -1,31 +1,40 @@
-export function $(expr, con) {
+// tslint:disable:forin
+// tslint:disable:object-literal-sort-keys
+
+export function $(expr: string | Element, con?: any) { // I don't know what it is
     return typeof expr === 'string'
         ? (con || document).querySelector(expr)
         : expr || null;
 }
 
-export function createSVG(tag, attrs) {
-    const elem = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    for (let attr in attrs) {
+export function createSVG(tag: string, attrs: any) {
+    const elem = document.createElementNS('http://www.w3.org/2000/svg', tag) as SVGGraphicsElement;
+    Object.keys(attrs).forEach((attr) => {
         if (attr === 'append_to') {
             const parent = attrs.append_to;
             parent.appendChild(elem);
+        } else if (attr === 'children') {
+            elem.append(attrs[attr]);
         } else if (attr === 'innerHTML') {
             elem.innerHTML = attrs.innerHTML;
+        } else if (attr === 'style') {
+            Object.keys(attrs[attr]).forEach((prop) => {
+                elem.style.setProperty(prop, attrs[attr][prop]);
+            });
         } else {
             elem.setAttribute(attr, attrs[attr]);
         }
-    }
+    });
     return elem;
 }
 
-export function animateSVG(svgElement, attr, from, to) {
+export function animateSVG(svgElement: SVGElement, attr: string, from: any, to: any) {
     const animatedSvgElement = getAnimationElement(svgElement, attr, from, to);
 
     if (animatedSvgElement === svgElement) {
         // triggered 2nd time programmatically
         // trigger artificial click event
-        const event = document.createEvent('HTMLEvents');
+        const event: Event & { eventName: string } = document.createEvent('HTMLEvents') as any;
         event.initEvent('click', true, true);
         event.eventName = 'click';
         animatedSvgElement.dispatchEvent(event);
@@ -33,12 +42,12 @@ export function animateSVG(svgElement, attr, from, to) {
 }
 
 function getAnimationElement(
-    svgElement,
-    attr,
-    from,
-    to,
+    svgElement: SVGElement,
+    attr: string,
+    from: any,
+    to: any,
     dur = '0.4s',
-    begin = '0.1s'
+    begin = '0.1s',
 ) {
     const animEl = svgElement.querySelector('animate');
     if (animEl) {
@@ -47,7 +56,7 @@ function getAnimationElement(
             from,
             to,
             dur,
-            begin: 'click + ' + begin // artificial click
+            begin: 'click + ' + begin, // artificial click
         });
         return svgElement;
     }
@@ -61,44 +70,49 @@ function getAnimationElement(
         calcMode: 'spline',
         values: from + ';' + to,
         keyTimes: '0; 1',
-        keySplines: cubic_bezier('ease-out')
+        keySplines: cubic_bezier('ease-out'),
     });
     svgElement.appendChild(animateElement);
 
     return svgElement;
 }
 
-function cubic_bezier(name) {
+function cubic_bezier(name: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out') {
     return {
-        ease: '.25 .1 .25 1',
-        linear: '0 0 1 1',
+        'ease': '.25 .1 .25 1',
+        'linear': '0 0 1 1',
         'ease-in': '.42 0 1 1',
         'ease-out': '0 0 .58 1',
-        'ease-in-out': '.42 0 .58 1'
+        'ease-in-out': '.42 0 .58 1',
     }[name];
 }
 
-$.on = (element, event, selector, callback) => {
+$.on = (element: Element, event: string, selector: string | EventListener, callback?: EventListener) => {
     if (!callback) {
-        callback = selector;
+        callback = selector as EventListener;
         $.bind(element, event, callback);
     } else {
-        $.delegate(element, event, selector, callback);
+        $.delegate(element, event, selector as string, callback);
     }
 };
 
-$.off = (element, event, handler) => {
+$.off = (element: Element, event: string, handler: EventHandlerNonNull) => {
     element.removeEventListener(event, handler);
 };
 
-$.bind = (element, event, callback) => {
-    event.split(/\s+/).forEach(function(event) {
+$.bind = (element: Element, events: string, callback: EventListener) => {
+    events.split(/\s+/).forEach((event) => {
         element.addEventListener(event, callback);
     });
 };
 
-$.delegate = (element, event, selector, callback) => {
-    element.addEventListener(event, function(e) {
+$.delegate = (
+    element: Element,
+    event: string,
+    selector: string,
+    callback: (e: any, target: any) => void,
+) => {
+    element.addEventListener(event, function(e: any) {
         const delegatedTarget = e.target.closest(selector);
         if (delegatedTarget) {
             e.delegatedTarget = delegatedTarget;
@@ -107,23 +121,25 @@ $.delegate = (element, event, selector, callback) => {
     });
 };
 
-$.closest = (selector, element) => {
-    if (!element) return null;
+$.closest = (selector: string, element: Element): Element => {
+    if (!element) {
+        return null;
+    }
 
     if (element.matches(selector)) {
         return element;
     }
 
-    return $.closest(selector, element.parentNode);
+    return $.closest(selector, element.parentNode as Element);
 };
 
-$.attr = (element, attr, value) => {
+$.attr = (element: Element, attr: any, value?: any) => {
     if (!value && typeof attr === 'string') {
         return element.getAttribute(attr);
     }
 
     if (typeof attr === 'object') {
-        for (let key in attr) {
+        for (const key in attr) {
             $.attr(element, key, attr[key]);
         }
         return;

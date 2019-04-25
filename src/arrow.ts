@@ -1,7 +1,18 @@
+// tslint:disable:variable-name
+// tslint:disable:object-literal-sort-keys
+
+import Bar from './bar';
+import { Gantt } from './index';
 import { createSVG } from './svg_utils';
 
 export default class Arrow {
-    constructor(gantt, from_task, to_task) {
+    public element: SVGGraphicsElement;
+    public from_task: Bar;
+    public to_task: Bar;
+    private gantt: Gantt;
+    private path: string;
+
+    constructor(gantt: Gantt, from_task: Bar, to_task: Bar) {
         this.gantt = gantt;
         this.from_task = from_task;
         this.to_task = to_task;
@@ -10,7 +21,7 @@ export default class Arrow {
         this.draw();
     }
 
-    calculate_path() {
+    public calculate_path() {
         let start_x =
             this.from_task.$bar.getX() + this.from_task.$bar.getWidth() / 2;
 
@@ -26,7 +37,7 @@ export default class Arrow {
             this.gantt.options.header_height +
             this.gantt.options.bar_height +
             (this.gantt.options.padding + this.gantt.options.bar_height) *
-                this.from_task.task._index +
+            this.from_task.task._index +
             this.gantt.options.padding;
 
         const end_x = this.to_task.$bar.getX() - this.gantt.options.padding / 2;
@@ -34,7 +45,7 @@ export default class Arrow {
             this.gantt.options.header_height +
             this.gantt.options.bar_height / 2 +
             (this.gantt.options.padding + this.gantt.options.bar_height) *
-                this.to_task.task._index +
+            this.to_task.task._index +
             this.gantt.options.padding;
 
         const from_is_below_to =
@@ -81,15 +92,16 @@ export default class Arrow {
         }
     }
 
-    draw() {
+    public draw() {
         this.element = createSVG('path', {
-            d: this.path,
+            'className': 'arrow',
+            'd': this.path,
             'data-from': this.from_task.task.id,
-            'data-to': this.to_task.task.id
+            'data-to': this.to_task.task.id,
         });
     }
 
-    update() {
+    public update() {
         this.calculate_path();
         this.element.setAttribute('d', this.path);
     }
