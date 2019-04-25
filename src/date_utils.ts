@@ -25,7 +25,7 @@ const month_names = {
         'September',
         'October',
         'November',
-        'December',
+        'December'
     ],
     ru: [
         'Январь',
@@ -39,7 +39,7 @@ const month_names = {
         'Сентябрь',
         'Октябрь',
         'Ноябрь',
-        'Декабрь',
+        'Декабрь'
     ],
     ptBr: [
         'Janeiro',
@@ -53,30 +53,33 @@ const month_names = {
         'Setembro',
         'Outubro',
         'Novembro',
-        'Dezembro',
-    ],
+        'Dezembro'
+    ]
 };
 
 type DateInput = [any, any, any, any, any, any, any];
 
 class date_utils {
-
-    public parse(date: Date | string, date_separator = '-', time_separator = /[.:]/): Date {
+    public parse(
+        date: Date | string,
+        date_separator = '-',
+        time_separator = /[.:]/
+    ): Date {
         if (date instanceof Date) {
             return date;
         }
         if (typeof date === 'string') {
-            let date_parts: (number | string)[];
-            let time_parts: (number | string)[] | null;
+            let date_parts: Array<number | string>;
+            let time_parts: Array<number | string> | null;
             const parts = date.split(' ');
 
             date_parts = parts[0]
                 .split(date_separator)
-                .map((val) => parseInt(val, 10));
+                .map(val => parseInt(val, 10));
             time_parts = parts[1] ? parts[1].split(time_separator) : null;
 
             // month is 0 indexed
-            date_parts[1] = date_parts[1] as number - 1;
+            date_parts[1] = (date_parts[1] as number) - 1;
 
             let vals = date_parts;
 
@@ -88,11 +91,12 @@ class date_utils {
                 vals = vals.concat(time_parts);
             }
 
-            return new Date(...vals as DateInput);
+            return new Date(...(vals as DateInput));
         }
-        return unreachable<typeof date>(new Error("Parse function received an unexpected object"));
+        return unreachable<typeof date>(
+            new Error('Parse function received an unexpected object')
+        );
     }
-
 
     public to_string(date: Date, with_time = false) {
         if (!(date instanceof Date)) {
@@ -116,8 +120,12 @@ class date_utils {
         return date_string + (with_time ? ' ' + time_string : '');
     }
 
-    public format(date: Date, format_string = 'YYYY-MM-DD HH:mm:ss.SSS', lang: 'en' | 'ru' | 'ptBr' = 'en') {
-        const values = this.get_date_values(date).map((d) => padStart(d, 2, 0));
+    public format(
+        date: Date,
+        format_string = 'YYYY-MM-DD HH:mm:ss.SSS',
+        lang: 'en' | 'ru' | 'ptBr' = 'en'
+    ) {
+        const values = this.get_date_values(date).map(d => padStart(d, 2, 0));
         const format_map = {
             YYYY: values[0],
             MM: padStart(+values[1] + 1, 2, 0),
@@ -128,7 +136,7 @@ class date_utils {
             SSS: values[6],
             D: values[2],
             MMMM: month_names[lang][+values[1]],
-            MMM: month_names[lang][+values[1]],
+            MMM: month_names[lang][+values[1]]
         };
 
         let str = format_string;
@@ -136,7 +144,7 @@ class date_utils {
 
         Object.keys(format_map)
             .sort((a, b) => b.length - a.length) // big string first
-            .forEach((key) => {
+            .forEach(key => {
                 if (str.includes(key)) {
                     str = str.replace(key, `$${formatted_values.length}`);
                     formatted_values.push(format_map[key]);
@@ -179,14 +187,14 @@ class date_utils {
                 hours,
                 days,
                 months,
-                years,
-            } as any)[scale],
+                years
+            } as any)[scale]
         );
     }
 
     public today() {
         const vals = this.get_date_values(new Date()).slice(0, 3);
-        return new Date(...vals as [any, any, any]);
+        return new Date(...(vals as [any, any, any]));
     }
 
     public now() {
@@ -202,9 +210,9 @@ class date_utils {
             date.getHours() + (scale === HOUR ? qty : 0),
             date.getMinutes() + (scale === MINUTE ? qty : 0),
             date.getSeconds() + (scale === SECOND ? qty : 0),
-            date.getMilliseconds() + (scale === MILLISECOND ? qty : 0),
+            date.getMilliseconds() + (scale === MILLISECOND ? qty : 0)
         ];
-        return new Date(...vals as DateInput);
+        return new Date(...(vals as DateInput));
     }
 
     public start_of(date: Date, scale: string) {
@@ -215,7 +223,7 @@ class date_utils {
             [HOUR]: 3,
             [MINUTE]: 2,
             [SECOND]: 1,
-            [MILLISECOND]: 0,
+            [MILLISECOND]: 0
         };
 
         function should_reset(_scale: string) {
@@ -230,17 +238,19 @@ class date_utils {
             should_reset(DAY) ? 0 : date.getHours(),
             should_reset(HOUR) ? 0 : date.getMinutes(),
             should_reset(MINUTE) ? 0 : date.getSeconds(),
-            should_reset(SECOND) ? 0 : date.getMilliseconds(),
+            should_reset(SECOND) ? 0 : date.getMilliseconds()
         ];
 
-        return new Date(...vals as DateInput);
+        return new Date(...(vals as DateInput));
     }
 
     public clone(date: Date) {
         return new Date(...this.get_date_values(date));
     }
 
-    public get_date_values(date: Date): [number, number, number, number, number, number, number] {
+    public get_date_values(
+        date: Date
+    ): [number, number, number, number, number, number, number] {
         return [
             date.getFullYear(),
             date.getMonth(),
@@ -248,7 +258,7 @@ class date_utils {
             date.getHours(),
             date.getMinutes(),
             date.getSeconds(),
-            date.getMilliseconds(),
+            date.getMilliseconds()
         ];
     }
 
@@ -271,7 +281,11 @@ class date_utils {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
-function padStart(str: number | string, targetLength: number, padString: number | string) {
+function padStart(
+    str: number | string,
+    targetLength: number,
+    padString: number | string
+) {
     str = str + '';
     // tslint:disable:no-bitwise
     targetLength = targetLength >> 0;

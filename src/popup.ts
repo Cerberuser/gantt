@@ -18,7 +18,10 @@ export default class Popup {
     private subtitle: Element | null = null;
     private pointer: Element & ElementCSSInlineStyle | null = null;
 
-    constructor(parent: Element & ElementCSSInlineStyle, custom_html: (task: ITaskInternal) => string) {
+    constructor(
+        parent: Element & ElementCSSInlineStyle,
+        custom_html: (task: ITaskInternal) => string
+    ) {
         this.parent = parent;
         this.custom_html = custom_html;
         this.make();
@@ -68,10 +71,10 @@ export default class Popup {
         }
 
         if (options.position === 'left') {
-            const parentHeight = this.parent.clientHeight + 10;
+            const parentHeight = this.parent!.clientHeight + 10;
             this.parent!.style.left = position_meta!.x + 'px';
             if (position_meta!.y < parentHeight) {
-                this.parent.style.top = position_meta.y + 50 + 'px';
+                this.parent!.style.top = position_meta!.y + 50 + 'px';
             } else {
                 this.parent!.style.top = position_meta!.y - parentHeight + 'px';
             }

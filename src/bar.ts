@@ -3,15 +3,8 @@
 
 import Arrow from './arrow';
 import date_utils from './date_utils';
-import {
-    Gantt,
-    ITaskInternal,
-} from './index';
-import {
-    $,
-    animateSVG,
-    createSVG,
-} from './svg_utils';
+import { Gantt, ITaskInternal } from './index';
+import { $, animateSVG, createSVG } from './svg_utils';
 
 declare global {
     // tslint:disable-next-line:interface-name
@@ -78,19 +71,19 @@ export default class Bar {
         this.width = this.gantt!.options!.column_width * this.duration;
         this.progress_width =
             this.gantt!.options!.column_width *
-            this.duration *
-            (this.task!.progress! / 100) || 0;
+                this.duration *
+                (this.task!.progress! / 100) || 0;
         this.group = createSVG('g', {
-            'class': 'bar-wrapper ' + (this.task!.custom_class || ''),
-            'data-id': this.task!.id,
+            class: 'bar-wrapper ' + (this.task!.custom_class || ''),
+            'data-id': this.task!.id
         });
         this.bar_group = createSVG('g', {
             class: 'bar-group',
-            append_to: this.group,
+            append_to: this.group
         });
         this.handle_group = createSVG('g', {
             class: 'handle-group',
-            append_to: this.group,
+            append_to: this.group
         });
     }
 
@@ -129,7 +122,7 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar',
             append_to: this.bar_group,
-            style: {fill: this.task.color},
+            style: { fill: this.task!.color }
         });
 
         animateSVG(this.$bar, 'width', 0, this.width);
@@ -152,7 +145,7 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar-progress',
             append_to: this.bar_group,
-            style: {fill: this.task!.color},
+            style: { fill: this.task!.color }
         });
 
         animateSVG(this.$bar_progress, 'width', 0, this.progress_width);
@@ -164,7 +157,7 @@ export default class Bar {
             y: this.y! + this.height! / 2,
             innerHTML: this.task!.name,
             class: 'bar-label',
-            append_to: this.bar_group,
+            append_to: this.bar_group
         });
         // labels get BBox in the next tick
         requestAnimationFrame(() => this.update_label_position());
@@ -186,7 +179,7 @@ export default class Bar {
             rx: this.corner_radius,
             ry: this.corner_radius,
             class: 'handle right',
-            append_to: this.handle_group,
+            append_to: this.handle_group
         });
 
         createSVG('rect', {
@@ -197,14 +190,14 @@ export default class Bar {
             rx: this.corner_radius,
             ry: this.corner_radius,
             class: 'handle left',
-            append_to: this.handle_group,
+            append_to: this.handle_group
         });
 
         if (this.task!.progress! && this.task!.progress! < 100) {
             this.$handle_progress = createSVG('polygon', {
                 points: this.get_progress_polygon_points().join(','),
                 class: 'handle progress',
-                append_to: this.handle_group,
+                append_to: this.handle_group
             });
         }
     }
@@ -217,7 +210,7 @@ export default class Bar {
             bar_progress.getEndX() + 5,
             bar_progress.getY() + bar_progress.getHeight(),
             bar_progress.getEndX(),
-            bar_progress.getY() + bar_progress.getHeight() - 8.66,
+            bar_progress.getY() + bar_progress.getHeight() - 8.66
         ];
     }
 
@@ -230,32 +223,44 @@ export default class Bar {
     }
 
     public setup_click_event() {
-        if (this.gantt.options.click_trigger) {
-            $.on(this.group!, 'focus ' + this.gantt!.options!.popup_trigger, (e) => {
-                if (this.action_completed) {
-                    // just finished a move action, wait for a few seconds
-                    return;
+        if (this.gantt!.options!.click_trigger) {
+            $.on(
+                this.group!,
+                'focus ' + this.gantt!.options!.popup_trigger,
+                e => {
+                    if (this.action_completed) {
+                        // just finished a move action, wait for a few seconds
+                        return;
+                    }
+
+                    if (e.type === 'click') {
+                        this.gantt!.trigger_event('click', [this.task!]);
+                    }
+
+                    this.gantt!.unselect_all();
+                    this.group!.classList.toggle('active');
+
+                    this.show_popup();
                 }
-
-                if (e.type === 'click') {
-                    this.gantt!.trigger_event('click', [this.task!]);
-                }
-
-                this.gantt!.unselect_all();
-                this.group!.classList.toggle('active');
-
-                this.show_popup();
-            });
+            );
         }
     }
 
     public setup_hover_event() {
-        $.on(this.group, 'mouseover ' + this.gantt.options.popup_trigger, () => {
-            this.show_popup();
-        });
-        $.on(this.group, 'mouseout ' + this.gantt.options.popup_trigger, () => {
-            this.gantt.hide_popup();
-        });
+        $.on(
+            this.group!,
+            'mouseover ' + this.gantt!.options!.popup_trigger,
+            () => {
+                this.show_popup();
+            }
+        );
+        $.on(
+            this.group!,
+            'mouseout ' + this.gantt!.options!.popup_trigger,
+            () => {
+                this.gantt!.hide_popup();
+            }
+        );
     }
 
     public show_popup() {
@@ -266,28 +271,35 @@ export default class Bar {
         const start_date = date_utils.format(this.task!._start, 'MMM D');
         const end_date = date_utils.format(
             date_utils.add(this.task!._end, -1, 'second'),
-            'MMM D',
+            'MMM D'
         );
-        const subtitle = start_date + ' - ' + end_date + (this.task.custom_data ? '<br>' + this.task.custom_data : '');
+        const subtitle =
+            start_date +
+            ' - ' +
+            end_date +
+            (this.task!.custom_data ? '<br>' + this.task!.custom_data : '');
 
         this.gantt!.show_popup({
             target_element: this.$bar!,
             title: this.task!.name,
             subtitle,
-            task: this.task!,
+            task: this.task!
         });
     }
 
-    public update_bar_position({x = undefined, width = undefined}: { x?: number, width?: number }) {
+    public update_bar_position({ x, width }: { x?: number; width?: number }) {
         if (x) {
             // get all x values of parent task
-            const xs = this.task!.dependencies.map((dep) => {
+            const xs = this.task!.dependencies.map(dep => {
                 return this.gantt!.get_bar(dep).$bar.getX();
             });
             // child task must not go before parent
-            const valid_x = xs.reduce(((_: any, curr: any) => {
-                return x >= curr;
-            }) as any, x); // why it ever works?!
+            const valid_x = xs.reduce(
+                ((_: any, curr: any) => {
+                    return x >= curr;
+                }) as any,
+                x
+            ); // why it ever works?!
             if (!valid_x) {
                 width = undefined;
                 return;
@@ -305,7 +317,7 @@ export default class Bar {
 
     public date_changed() {
         let changed = false;
-        const {new_start_date, new_end_date} = this.compute_start_end_date();
+        const { new_start_date, new_end_date } = this.compute_start_end_date();
 
         if (Number(this.task!._start) !== Number(new_start_date)) {
             changed = true;
@@ -324,14 +336,17 @@ export default class Bar {
         this.gantt!.trigger_event('date_change', [
             this.task!,
             new_start_date,
-            date_utils.add(new_end_date, -1, 'second'),
+            date_utils.add(new_end_date, -1, 'second')
         ]);
     }
 
     public progress_changed() {
         const new_progress = this.compute_progress();
         this.task!.progress! = new_progress;
-        this.gantt!.trigger_event('progress_change', [this.task!, new_progress]);
+        this.gantt!.trigger_event('progress_change', [
+            this.task!,
+            new_progress
+        ]);
     }
 
     public set_action_completed() {
@@ -345,35 +360,36 @@ export default class Bar {
         const new_start_date = date_utils.add(
             this.gantt!.gantt_start!,
             x_in_units * this.gantt!.options!.step,
-            'hour',
+            'hour'
         );
-        const width_in_units = bar.getWidth() / this.gantt!.options!.column_width;
+        const width_in_units =
+            bar.getWidth() / this.gantt!.options!.column_width;
         const new_end_date = date_utils.add(
             new_start_date,
             width_in_units * this.gantt!.options!.step,
-            'hour',
+            'hour'
         );
 
-        return {new_start_date, new_end_date};
+        return { new_start_date, new_end_date };
     }
 
     public compute_progress() {
         const progress =
-            this.$bar_progress!.getWidth() / this.$bar!.getWidth() * 100;
+            (this.$bar_progress!.getWidth() / this.$bar!.getWidth()) * 100;
         return parseInt(progress as any, 10);
     }
 
     public compute_x() {
-        const {step, column_width} = this.gantt!.options!;
+        const { step, column_width } = this.gantt!.options!;
         const task_start = this.task!._start;
         const gantt_start = this.gantt!.gantt_start;
 
         const diffHour = date_utils.diff(task_start, gantt_start, 'hour');
-        let x = diffHour / step * column_width;
+        let x = (diffHour / step) * column_width;
 
         if (this.gantt!.view_is('Month')) {
             const diffDay = date_utils.diff(task_start, gantt_start, 'day');
-            x = diffDay * column_width / 30;
+            x = (diffDay * column_width) / 30;
         }
         return x;
     }
@@ -429,10 +445,8 @@ export default class Bar {
 
     public update_progressbar_position() {
         this.$bar_progress!.setAttribute('x', this.$bar!.getX() as any);
-        this.$bar_progress!.setAttribute(
-            'width',
-            this.$bar!.getWidth() * (this.task!.progress! / 100) as any,
-        );
+        this.$bar_progress!.setAttribute('width', (this.$bar!.getWidth() *
+            (this.task!.progress! / 100)) as any);
     }
 
     public update_label_position() {
@@ -449,7 +463,7 @@ export default class Bar {
             label.innerHTML = s + '...';
         } else {
             label.classList.remove('big');
-            label.setAttribute('x', bar.getX() + bar.getWidth() / 2 as any);
+            label.setAttribute('x', (bar.getX() + bar.getWidth() / 2) as any);
         }
     }
 
@@ -457,13 +471,16 @@ export default class Bar {
         const bar = this.$bar!;
         this.handle_group
             .querySelector('.handle.left')
-            .setAttribute('x', bar.getX() + 1 as any);
+            .setAttribute('x', (bar.getX() + 1) as any);
         this.handle_group
             .querySelector('.handle.right')
-            .setAttribute('x', bar.getEndX() - 9 as any);
+            .setAttribute('x', (bar.getEndX() - 9) as any);
         const handle = this.group!.querySelector('.handle.progress');
         if (handle) {
-            handle.setAttribute('points', this.get_progress_polygon_points() as any);
+            handle.setAttribute(
+                'points',
+                this.get_progress_polygon_points() as any
+            );
         }
     }
 

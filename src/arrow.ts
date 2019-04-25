@@ -37,15 +37,16 @@ export default class Arrow {
             this.gantt.options!.header_height +
             this.gantt.options!.bar_height +
             (this.gantt.options!.padding + this.gantt.options!.bar_height) *
-            this.from_task.task!._index +
+                this.from_task.task!._index +
             this.gantt.options!.padding;
 
-        const end_x = this.to_task.$bar!.getX() - this.gantt.options!.padding / 2;
+        const end_x =
+            this.to_task.$bar!.getX() - this.gantt.options!.padding / 2;
         const end_y =
             this.gantt.options!.header_height +
             this.gantt.options!.bar_height / 2 +
             (this.gantt.options!.padding + this.gantt.options!.bar_height) *
-            this.to_task.task!._index +
+                this.to_task.task!._index +
             this.gantt.options!.padding;
 
         const from_is_below_to =
@@ -75,7 +76,8 @@ export default class Arrow {
                 this.to_task.$bar!.getY() +
                 this.to_task.$bar!.getHeight() / 2 -
                 curve_y;
-            const left = this.to_task.$bar!.getX() - this.gantt.options!.padding;
+            const left =
+                this.to_task.$bar!.getX() - this.gantt.options!.padding;
 
             this.path = `
                 M ${start_x} ${start_y}
@@ -94,10 +96,10 @@ export default class Arrow {
 
     public draw() {
         this.element = createSVG('path', {
-            'className': 'arrow',
-            'd': this.path,
+            className: 'arrow',
+            d: this.path,
             'data-from': this.from_task.task!.id,
-            'data-to': this.to_task.task!.id,
+            'data-to': this.to_task.task!.id
         });
     }
 

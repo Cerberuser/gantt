@@ -6,7 +6,8 @@
         "tslint-config-prettier"
     ],
     "rules": {
-        "prettier": true
+        "prettier": true,
+        "interface-name": false
     },
     "rulesDirectory": []
 }
