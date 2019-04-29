@@ -21,8 +21,7 @@ export interface ITask {
     custom_data?: string;
 }
 
-export interface ITaskInternal
-    extends Pick<ITask, Exclude<keyof ITask, 'dependencies'>> {
+export interface ITaskInternal extends Pick<ITask, Exclude<keyof ITask, 'dependencies'>> {
     color?: string;
     _start: Date;
     _end: Date;
@@ -100,7 +99,55 @@ export class Gantt {
         this.bind_events();
     }
 
-    public setup_wrapper(element: Element | string) {
+    public unselect_all() {
+        Array.from(this.$svg!.querySelectorAll('.bar-wrapper')).forEach(el => {
+            el.classList.remove('active');
+        });
+    }
+
+    public view_is(modes: string | string[]) {
+        if (typeof modes === 'string') {
+            return this.options!.view_mode === modes;
+        }
+
+        if (Array.isArray(modes)) {
+            return modes.some(mode => this.options!.view_mode === mode);
+        }
+
+        return false;
+    }
+
+    public get_bar(id: string): any {
+        return this.bars!.find(bar => {
+            return bar.task!.id === id;
+        });
+    }
+
+    public show_popup(options: Partial<IPopupOptions>) {
+        if (!this.popup) {
+            this.popup = new Popup(this.popup_wrapper!, this.options!.custom_popup_html!);
+        }
+        this.popup.show(options);
+    }
+
+    public hide_popup() {
+        if (this.popup) {
+            this.popup.hide();
+        }
+    }
+
+    public trigger_event(event: string, args: any) {
+        if ((this.options as any)['on_' + event]) {
+            (this.options as any)['on_' + event].apply(null, args);
+        }
+    }
+
+    public refresh(tasks: ITask[]) {
+        this.setup_tasks(tasks);
+        this.change_view_mode();
+    }
+
+    private setup_wrapper(element: Element | string) {
         let svg_element;
         let wrapper_element;
         let local_element: Element | string | null = element;
@@ -149,7 +196,7 @@ export class Gantt {
         this.$container.appendChild(this.popup_wrapper);
     }
 
-    public setup_options(options: Partial<IOptions>) {
+    private setup_options(options: Partial<IOptions>) {
         const default_options: IOptions = {
             auto_scroll: false,
             click_trigger: false,
@@ -178,7 +225,7 @@ export class Gantt {
         this.options = Object.assign({}, default_options, options);
     }
 
-    public setup_tasks(tasks: ITask[]) {
+    private setup_tasks(tasks: ITask[]) {
         // prepare tasks
         this.tasks = tasks.map((_task, i) => {
             const task = (_task as unknown) as ITaskInternal; // hack to get around typing problems
@@ -245,7 +292,7 @@ export class Gantt {
         this.setup_groups();
     }
 
-    public setup_dependencies() {
+    private setup_dependencies() {
         this.dependency_map = {};
         for (const t of this.tasks!) {
             for (const d of t.dependencies) {
@@ -255,7 +302,7 @@ export class Gantt {
         }
     }
 
-    public setup_groups() {
+    private setup_groups() {
         this.groups = {};
         let groupsCount = 0;
         this.tasks!.forEach(task => {
@@ -266,12 +313,7 @@ export class Gantt {
         });
     }
 
-    public refresh(tasks: ITask[]) {
-        this.setup_tasks(tasks);
-        this.change_view_mode();
-    }
-
-    public change_view_mode(mode: ViewMode = this.options!.view_mode) {
+    private change_view_mode(mode: ViewMode = this.options!.view_mode) {
         this.update_view_scale(mode);
         if (this.tasks!.length === 0) {
             return;
@@ -282,7 +324,7 @@ export class Gantt {
         this.trigger_event('view_change', [mode]);
     }
 
-    public update_view_scale(view_mode: ViewMode) {
+    private update_view_scale(view_mode: ViewMode) {
         this.options!.view_mode = view_mode;
 
         if (view_mode === 'Day') {
@@ -306,12 +348,12 @@ export class Gantt {
         }
     }
 
-    public setup_dates() {
+    private setup_dates() {
         this.setup_gantt_dates();
         this.setup_date_values();
     }
 
-    public setup_gantt_dates() {
+    private setup_gantt_dates() {
         this.gantt_start = this.gantt_end = null;
 
         for (const task of this.tasks!) {
@@ -343,15 +385,14 @@ export class Gantt {
         }
     }
 
-    public setup_date_values() {
+    private setup_date_values() {
         this.dates = [];
         let cur_date = null;
 
         while (
             cur_date === null ||
             cur_date < this.gantt_end! ||
-            this.dates.length * this.options!.column_width + 150 <
-                this.$container!.offsetWidth
+            this.dates.length * this.options!.column_width + 150 < this.$container!.offsetWidth
         ) {
             if (!cur_date) {
                 cur_date = date_utils.clone(this.gantt_start!);
@@ -361,23 +402,19 @@ export class Gantt {
                 } else if (this.view_is('Month')) {
                     cur_date = date_utils.add(cur_date, 1, 'month');
                 } else {
-                    cur_date = date_utils.add(
-                        cur_date,
-                        this.options!.step,
-                        'hour'
-                    );
+                    cur_date = date_utils.add(cur_date, this.options!.step, 'hour');
                 }
             }
             this.dates!.push(cur_date);
         }
     }
 
-    public bind_events() {
+    private bind_events() {
         this.bind_grid_click();
         this.bind_bar_events();
     }
 
-    public render() {
+    private render() {
         this.clear();
         this.setup_layers();
         this.make_grid();
@@ -389,7 +426,7 @@ export class Gantt {
         this.set_scroll_position();
     }
 
-    public setup_layers() {
+    private setup_layers() {
         this.layers = {};
         const layers = ['grid', 'date', 'arrow', 'progress', 'bar', 'details'];
         // make group layers
@@ -401,7 +438,7 @@ export class Gantt {
         }
     }
 
-    public make_grid() {
+    private make_grid() {
         this.make_grid_background();
         this.make_grid_rows();
         this.make_grid_header();
@@ -410,13 +447,12 @@ export class Gantt {
         this.make_legend();
     }
 
-    public make_grid_background() {
+    private make_grid_background() {
         const rect = {
             height:
                 this.options!.header_height +
                 this.options!.padding +
-                (this.options!.bar_height + this.options!.padding) *
-                    this.tasks!.length,
+                (this.options!.bar_height + this.options!.padding) * this.tasks!.length,
             width: this.dates!.length * this.options!.column_width + 150
         };
         createSVG('rect', {
@@ -429,7 +465,7 @@ export class Gantt {
         $.attr(this.$svg!, rect);
     }
 
-    public make_grid_rows() {
+    private make_grid_rows() {
         const rows_layer = createSVG('g', { append_to: this.layers!.grid });
         const lines_layer = createSVG('g', { append_to: this.layers!.grid });
 
@@ -463,7 +499,7 @@ export class Gantt {
         });
     }
 
-    public make_grid_header() {
+    private make_grid_header() {
         const header_width = this.dates!.length * this.options!.column_width;
         const header_height = this.options!.header_height + 10;
         createSVG('rect', {
@@ -476,7 +512,7 @@ export class Gantt {
         });
     }
 
-    public make_legend() {
+    private make_legend() {
         const legend_height = this.options!.bar_height + this.options!.padding;
         const common_attrs = {
             x: 0,
@@ -485,9 +521,7 @@ export class Gantt {
             append_to: this.layers!.grid
         };
         Array.from(new Set(this.tasks!.map(t => t.group!))).forEach(group => {
-            const height =
-                this.tasks!.filter(t => t.group === group).length *
-                legend_height;
+            const height = this.tasks!.filter(t => t.group === group).length * legend_height;
             createSVG('rect', {
                 ...common_attrs,
                 height,
@@ -507,12 +541,10 @@ export class Gantt {
         });
     }
 
-    public make_grid_ticks() {
+    private make_grid_ticks() {
         let tick_x = 0;
         const tick_y = this.options!.header_height + this.options!.padding / 2;
-        const tick_height =
-            (this.options!.bar_height + this.options!.padding) *
-            this.tasks!.length;
+        const tick_height = (this.options!.bar_height + this.options!.padding) * this.tasks!.length;
 
         for (const date of this.dates!) {
             let tick_class = 'tick';
@@ -521,11 +553,7 @@ export class Gantt {
                 tick_class += ' thick';
             }
             // thick tick for first week
-            if (
-                this.view_is('Week') &&
-                date.getDate() >= 1 &&
-                date.getDate() < 8
-            ) {
+            if (this.view_is('Week') && date.getDate() >= 1 && date.getDate() < 8) {
                 tick_class += ' thick';
             }
             // thick ticks for quarters
@@ -540,29 +568,24 @@ export class Gantt {
             });
 
             if (this.view_is('Month')) {
-                tick_x +=
-                    (date_utils.get_days_in_month(date) *
-                        this.options!.column_width) /
-                    30;
+                tick_x += (date_utils.get_days_in_month(date) * this.options!.column_width) / 30;
             } else {
                 tick_x += this.options!.column_width;
             }
         }
     }
 
-    public make_grid_highlights() {
+    private make_grid_highlights() {
         // highlight today's date
         if (this.view_is('Day')) {
             const x =
-                (date_utils.diff(date_utils.today(), this.gantt_start, 'hour') /
-                    this.options!.step) *
+                (date_utils.diff(date_utils.today(), this.gantt_start, 'hour') / this.options!.step) *
                 this.options!.column_width;
             const y = 0;
 
             const width = this.options!.column_width;
             const height =
-                (this.options!.bar_height + this.options!.padding) *
-                    this.tasks!.length +
+                (this.options!.bar_height + this.options!.padding) * this.tasks!.length +
                 this.options!.header_height +
                 this.options!.padding / 2;
 
@@ -577,7 +600,7 @@ export class Gantt {
         }
     }
 
-    public make_dates() {
+    private make_dates() {
         for (const date of this.get_dates_to_draw()) {
             createSVG('text', {
                 x: date.lower_x + 150,
@@ -597,17 +620,14 @@ export class Gantt {
                 });
 
                 // remove out-of-bound dates
-                if (
-                    ($upper_text.getBBox() as any).x2 >
-                    this.layers!.grid.getBBox().width
-                ) {
+                if (($upper_text.getBBox() as any).x2 > this.layers!.grid.getBBox().width) {
                     $upper_text.remove();
                 }
             }
         }
     }
 
-    public get_dates_to_draw() {
+    private get_dates_to_draw() {
         let last_date: Date | null = null;
         const dates = this.dates!.map((date, i) => {
             const d = this.get_date_info(date, last_date!, i);
@@ -617,57 +637,33 @@ export class Gantt {
         return dates;
     }
 
-    public get_date_info(date: Date, last_date: Date, i: number) {
+    private get_date_info(date: Date, last_date: Date, i: number) {
         if (!last_date) {
             last_date = date_utils.add(date, 1, 'year');
         }
         const date_text: any = {
-            'Quarter Day_lower': date_utils.format(
-                date,
-                'HH',
-                this.options!.language
-            ),
-            'Half Day_lower': date_utils.format(
-                date,
-                'HH',
-                this.options!.language
-            ),
+            'Quarter Day_lower': date_utils.format(date, 'HH', this.options!.language),
+            'Half Day_lower': date_utils.format(date, 'HH', this.options!.language),
             Day_lower:
-                date.getDate() !== last_date.getDate()
-                    ? date_utils.format(date, 'D', this.options!.language)
-                    : '',
+                date.getDate() !== last_date.getDate() ? date_utils.format(date, 'D', this.options!.language) : '',
             Week_lower:
                 date.getMonth() !== last_date.getMonth()
                     ? date_utils.format(date, 'D MMM', this.options!.language)
                     : date_utils.format(date, 'D', this.options!.language),
-            Month_lower: date_utils.format(
-                date,
-                'MMMM',
-                this.options!.language
-            ),
+            Month_lower: date_utils.format(date, 'MMMM', this.options!.language),
             Year_lower: date_utils.format(date, 'YYYY', this.options!.language),
             'Quarter Day_upper':
-                date.getDate() !== last_date.getDate()
-                    ? date_utils.format(date, 'D MMM', this.options!.language)
-                    : '',
+                date.getDate() !== last_date.getDate() ? date_utils.format(date, 'D MMM', this.options!.language) : '',
             'Half Day_upper':
                 date.getDate() !== last_date.getDate()
                     ? date.getMonth() !== last_date.getMonth()
-                        ? date_utils.format(
-                              date,
-                              'D MMM',
-                              this.options!.language
-                          )
+                        ? date_utils.format(date, 'D MMM', this.options!.language)
                         : date_utils.format(date, 'D', this.options!.language)
                     : '',
             Day_upper:
-                date.getMonth() !== last_date.getMonth()
-                    ? date_utils.format(date, 'MMMM', this.options!.language)
-                    : '',
+                date.getMonth() !== last_date.getMonth() ? date_utils.format(date, 'MMMM', this.options!.language) : '',
             Week_upper:
-                date.getMonth() !== last_date.getMonth()
-                    ? date_utils.format(date, 'MMMM', this.options!.language)
-                    : '',
+                date.getMonth() !== last_date.getMonth() ? date_utils.format(date, 'MMMM', this.options!.language) : '',
             Month_upper:
                 date.getFullYear() !== last_date.getFullYear()
                     ? date_utils.format(date, 'YYYY', this.options!.language)
@@ -709,7 +705,7 @@ export class Gantt {
         };
     }
 
-    public make_bars() {
+    private make_bars() {
         this.bars = this.tasks!.map(task => {
             task.color = this.groups![task.group!].color;
             const bar = new Bar(this, task);
@@ -718,7 +714,7 @@ export class Gantt {
         });
     }
 
-    public make_arrows() {
+    private make_arrows() {
         this.arrows = [];
         for (const task of this.tasks!) {
             let arrows = [];
@@ -741,29 +737,23 @@ export class Gantt {
         }
     }
 
-    public map_arrows_on_bars() {
+    private map_arrows_on_bars() {
         for (const bar of this.bars!) {
             bar.arrows = this.arrows!.filter(arrow => {
-                return (
-                    arrow.from_task.task!.id === bar.task!.id ||
-                    arrow.to_task.task!.id === bar.task!.id
-                );
+                return arrow.from_task.task!.id === bar.task!.id || arrow.to_task.task!.id === bar.task!.id;
             });
         }
     }
 
-    public set_width() {
-        const cur_width = (this.$svg!.getBoundingClientRect()
-            .width as unknown) as string;
-        const actual_width = this.$svg!.querySelector(
-            '.grid .grid-row'
-        )!.getAttribute('width')!;
+    private set_width() {
+        const cur_width = (this.$svg!.getBoundingClientRect().width as unknown) as string;
+        const actual_width = this.$svg!.querySelector('.grid .grid-row')!.getAttribute('width')!;
         if (cur_width < actual_width) {
             this.$svg!.setAttribute('width', actual_width);
         }
     }
 
-    public set_scroll_position() {
+    private set_scroll_position() {
         if (!this.options!.auto_scroll) {
             return;
         }
@@ -772,33 +762,22 @@ export class Gantt {
             return;
         }
 
-        const hours_before_first_task = date_utils.diff(
-            this.get_oldest_starting_date(),
-            this.gantt_start,
-            'hour'
-        );
+        const hours_before_first_task = date_utils.diff(this.get_oldest_starting_date(), this.gantt_start, 'hour');
 
         const scroll_pos =
-            (hours_before_first_task / this.options!.step) *
-                this.options!.column_width -
-            this.options!.column_width;
+            (hours_before_first_task / this.options!.step) * this.options!.column_width - this.options!.column_width;
 
         parent_element.scrollLeft = scroll_pos;
     }
 
-    public bind_grid_click() {
-        $.on(
-            this.$svg!,
-            this.options!.popup_trigger,
-            '.grid-row, .grid-header',
-            () => {
-                this.unselect_all();
-                this.hide_popup();
-            }
-        );
+    private bind_grid_click() {
+        $.on(this.$svg!, this.options!.popup_trigger, '.grid-row, .grid-header', () => {
+            this.unselect_all();
+            this.hide_popup();
+        });
     }
 
-    public bind_bar_events() {
+    private bind_bar_events() {
         let is_dragging = false;
         if (!this.options!.interactive) {
             return;
@@ -814,10 +793,7 @@ export class Gantt {
             return is_dragging || is_resizing_left || is_resizing_right;
         }
 
-        $.on(this.$svg!, 'mousedown', '.bar-wrapper, .handle', ((
-            e: any,
-            element: any
-        ) => {
+        $.on(this.$svg!, 'mousedown', '.bar-wrapper, .handle', ((e: any, element: any) => {
             const bar_wrapper = $.closest('.bar-wrapper', element)!;
 
             if (element.classList.contains('left')) {
@@ -833,10 +809,7 @@ export class Gantt {
             x_on_start = e.offsetX;
 
             parent_bar_id = bar_wrapper.getAttribute('data-id')!;
-            const ids = [
-                parent_bar_id,
-                ...this.get_all_dependent_tasks(parent_bar_id)
-            ];
+            const ids = [parent_bar_id, ...this.get_all_dependent_tasks(parent_bar_id)];
             bars = ids.map(id => this.get_bar(id));
 
             this.bar_being_dragged = parent_bar_id;
@@ -908,17 +881,14 @@ export class Gantt {
         this.bind_bar_progress();
     }
 
-    public bind_bar_progress() {
+    private bind_bar_progress() {
         let x_on_start = 0;
         let is_resizing: boolean | null = null;
         let bar: Bar | null = null;
         let $bar_progress: any = null;
         let $bar = null;
 
-        $.on(this.$svg!, 'mousedown', '.handle.progress', ((
-            e: any,
-            handle: any
-        ) => {
+        $.on(this.$svg!, 'mousedown', '.handle.progress', ((e: any, handle: any) => {
             is_resizing = true;
             x_on_start = e.offsetX;
 
@@ -964,7 +934,7 @@ export class Gantt {
         });
     }
 
-    public get_all_dependent_tasks(task_id: string) {
+    private get_all_dependent_tasks(task_id: string) {
         let out: string[] = [];
         let to_process = [task_id];
         while (to_process.length) {
@@ -980,89 +950,28 @@ export class Gantt {
         return out.filter(Boolean);
     }
 
-    public get_snap_position(dx: number) {
+    private get_snap_position(dx: number) {
         const odx = dx;
         let rem;
         let position;
 
         if (this.view_is('Week')) {
             rem = dx % (this.options!.column_width / 7);
-            position =
-                odx -
-                rem +
-                (rem < this.options!.column_width / 14
-                    ? 0
-                    : this.options!.column_width / 7);
+            position = odx - rem + (rem < this.options!.column_width / 14 ? 0 : this.options!.column_width / 7);
         } else if (this.view_is('Month')) {
             rem = dx % (this.options!.column_width / 30);
-            position =
-                odx -
-                rem +
-                (rem < this.options!.column_width / 60
-                    ? 0
-                    : this.options!.column_width / 30);
+            position = odx - rem + (rem < this.options!.column_width / 60 ? 0 : this.options!.column_width / 30);
         } else {
             rem = dx % this.options!.column_width;
-            position =
-                odx -
-                rem +
-                (rem < this.options!.column_width / 2
-                    ? 0
-                    : this.options!.column_width);
+            position = odx - rem + (rem < this.options!.column_width / 2 ? 0 : this.options!.column_width);
         }
         return position;
     }
 
-    public unselect_all() {
-        Array.from(this.$svg!.querySelectorAll('.bar-wrapper')).forEach(el => {
-            el.classList.remove('active');
-        });
-    }
-
-    public view_is(modes: string | string[]) {
-        if (typeof modes === 'string') {
-            return this.options!.view_mode === modes;
-        }
-
-        if (Array.isArray(modes)) {
-            return modes.some(mode => this.options!.view_mode === mode);
-        }
-
-        return false;
-    }
-
-    public get_task(id: string) {
+    private get_task(id: string) {
         return this.tasks!.find(task => {
             return task.id === id;
         });
-    }
-
-    public get_bar(id: string): any {
-        return this.bars!.find(bar => {
-            return bar.task!.id === id;
-        });
-    }
-
-    public show_popup(options: Partial<IPopupOptions>) {
-        if (!this.popup) {
-            this.popup = new Popup(
-                this.popup_wrapper!,
-                this.options!.custom_popup_html!
-            );
-        }
-        this.popup.show(options);
-    }
-
-    public hide_popup() {
-        if (this.popup) {
-            this.popup.hide();
-        }
-    }
-
-    public trigger_event(event: string, args: any) {
-        if ((this.options as any)['on_' + event]) {
-            (this.options as any)['on_' + event].apply(null, args);
-        }
     }
 
     /**
@@ -1071,10 +980,9 @@ export class Gantt {
      * @returns Date
      * @memberof Gantt
      */
-    public get_oldest_starting_date() {
-        return this.tasks!.map(task => task._start).reduce(
-            (prev_date, cur_date) =>
-                cur_date <= prev_date ? cur_date : prev_date
+    private get_oldest_starting_date() {
+        return this.tasks!.map(task => task._start).reduce((prev_date, cur_date) =>
+            cur_date <= prev_date ? cur_date : prev_date
         );
     }
 
@@ -1083,7 +991,7 @@ export class Gantt {
      *
      * @memberof Gantt
      */
-    public clear() {
+    private clear() {
         this.$svg!.innerHTML = '';
     }
 }

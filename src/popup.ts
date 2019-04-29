@@ -18,27 +18,10 @@ export default class Popup {
     private subtitle: Element | null = null;
     private pointer: Element & ElementCSSInlineStyle | null = null;
 
-    constructor(
-        parent: Element & ElementCSSInlineStyle,
-        custom_html: (task: ITaskInternal) => string
-    ) {
+    constructor(parent: Element & ElementCSSInlineStyle, custom_html: (task: ITaskInternal) => string) {
         this.parent = parent;
         this.custom_html = custom_html;
         this.make();
-    }
-
-    public make() {
-        this.parent!.innerHTML = `
-            <div class="title"></div>
-            <div class="subtitle"></div>
-            <div class="pointer"></div>
-        `;
-
-        this.hide();
-
-        this.title = this.parent!.querySelector('.title');
-        this.subtitle = this.parent!.querySelector('.subtitle');
-        this.pointer = this.parent!.querySelector('.pointer');
     }
 
     public show(options: Partial<IPopupOptions>) {
@@ -90,5 +73,19 @@ export default class Popup {
 
     public hide() {
         this.parent!.style.opacity = 0 as any;
+    }
+
+    private make() {
+        this.parent!.innerHTML = `
+            <div class="title"></div>
+            <div class="subtitle"></div>
+            <div class="pointer"></div>
+        `;
+
+        this.hide();
+
+        this.title = this.parent!.querySelector('.title');
+        this.subtitle = this.parent!.querySelector('.subtitle');
+        this.pointer = this.parent!.querySelector('.pointer');
     }
 }

@@ -4,12 +4,7 @@
 interface SVGUtils {
     (expr: string | Element, con?: Element): Element | null;
 
-    on(
-        element: Element,
-        event: string,
-        selector: string | EventListener,
-        callback: EventListener
-    ): void;
+    on(element: Element, event: string, selector: string | EventListener, callback: EventListener): void;
 
     on(element: Element, event: string, callback: EventListener): void;
 
@@ -17,12 +12,7 @@ interface SVGUtils {
 
     bind(element: Element, events: string, callback: EventListener): void;
 
-    delegate(
-        element: Element,
-        event: string,
-        selector: string,
-        callback: (e: any, target: any) => void
-    ): void;
+    delegate(element: Element, event: string, selector: string, callback: (e: any, target: any) => void): void;
 
     closest(selector: string, element: Element): Element | null;
 
@@ -34,19 +24,11 @@ interface SVGUtils {
 }
 
 export const $: SVGUtils = (expr, con?) => {
-    return typeof expr === 'string'
-        ? (con || document).querySelector(expr)
-        : expr || null;
+    return typeof expr === 'string' ? (con || document).querySelector(expr) : expr || null;
 };
 
-export function createSVG(
-    tag: string,
-    attrs: Record<string, any> & { style?: Record<string, any> }
-) {
-    const elem = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        tag
-    ) as SVGGraphicsElement;
+export function createSVG(tag: string, attrs: Record<string, any> & { style?: Record<string, any> }) {
+    const elem = document.createElementNS('http://www.w3.org/2000/svg', tag) as SVGGraphicsElement;
     Object.keys(attrs).forEach(attr => {
         if (attr === 'append_to') {
             const parent = attrs.append_to;
@@ -66,34 +48,20 @@ export function createSVG(
     return elem;
 }
 
-export function animateSVG(
-    svgElement: SVGElement,
-    attr: string,
-    from: any,
-    to: any
-) {
+export function animateSVG(svgElement: SVGElement, attr: string, from: any, to: any) {
     const animatedSvgElement = getAnimationElement(svgElement, attr, from, to);
 
     if (animatedSvgElement === svgElement) {
         // triggered 2nd time programmatically
         // trigger artificial click event
-        const event: Event & { eventName: string } = document.createEvent(
-            'HTMLEvents'
-        ) as any;
+        const event: Event & { eventName: string } = document.createEvent('HTMLEvents') as any;
         event.initEvent('click', true, true);
         event.eventName = 'click';
         animatedSvgElement.dispatchEvent(event);
     }
 }
 
-function getAnimationElement(
-    svgElement: SVGElement,
-    attr: string,
-    from: any,
-    to: any,
-    dur = '0.4s',
-    begin = '0.1s'
-) {
+function getAnimationElement(svgElement: SVGElement, attr: string, from: any, to: any, dur = '0.4s', begin = '0.1s') {
     const animEl = svgElement.querySelector('animate');
     if (animEl) {
         $.attr(animEl, {
@@ -122,9 +90,7 @@ function getAnimationElement(
     return svgElement;
 }
 
-function cubic_bezier(
-    name: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'
-) {
+function cubic_bezier(name: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out') {
     return {
         ease: '.25 .1 .25 1',
         linear: '0 0 1 1',

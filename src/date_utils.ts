@@ -60,11 +60,7 @@ const month_names = {
 type DateInput = [any, any, any, any, any, any, any];
 
 class date_utils {
-    public parse(
-        date: Date | string,
-        date_separator = '-',
-        time_separator = /[.:]/
-    ): Date {
+    public parse(date: Date | string, date_separator = '-', time_separator = /[.:]/): Date {
         if (date instanceof Date) {
             return date;
         }
@@ -73,9 +69,7 @@ class date_utils {
             let time_parts: Array<number | string> | null;
             const parts = date.split(' ');
 
-            date_parts = parts[0]
-                .split(date_separator)
-                .map(val => parseInt(val, 10));
+            date_parts = parts[0].split(date_separator).map(val => parseInt(val, 10));
             time_parts = parts[1] ? parts[1].split(time_separator) : null;
 
             // month is 0 indexed
@@ -93,9 +87,7 @@ class date_utils {
 
             return new Date(...(vals as DateInput));
         }
-        return unreachable<typeof date>(
-            new Error('Parse function received an unexpected object')
-        );
+        return unreachable<typeof date>(new Error('Parse function received an unexpected object'));
     }
 
     public to_string(date: Date, with_time = false) {
@@ -120,11 +112,7 @@ class date_utils {
         return date_string + (with_time ? ' ' + time_string : '');
     }
 
-    public format(
-        date: Date,
-        format_string = 'YYYY-MM-DD HH:mm:ss.SSS',
-        lang: 'en' | 'ru' | 'ptBr' = 'en'
-    ) {
+    public format(date: Date, format_string = 'YYYY-MM-DD HH:mm:ss.SSS', lang: 'en' | 'ru' | 'ptBr' = 'en') {
         const values = this.get_date_values(date).map(d => padStart(d, 2, 0));
         const format_map = {
             YYYY: values[0],
@@ -248,9 +236,7 @@ class date_utils {
         return new Date(...this.get_date_values(date));
     }
 
-    public get_date_values(
-        date: Date
-    ): [number, number, number, number, number, number, number] {
+    public get_date_values(date: Date): [number, number, number, number, number, number, number] {
         return [
             date.getFullYear(),
             date.getMonth(),
@@ -281,11 +267,7 @@ class date_utils {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
-function padStart(
-    str: number | string,
-    targetLength: number,
-    padString: number | string
-) {
+function padStart(str: number | string, targetLength: number, padString: number | string) {
     str = str + '';
     // tslint:disable:no-bitwise
     targetLength = targetLength >> 0;
