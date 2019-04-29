@@ -862,6 +862,7 @@ var Gantt = (function (exports) {
             else if (target_element instanceof SVGElement) {
                 position_meta = options.target_element.getBBox();
             }
+            // FIXME this has to be refactored
             if (options.position === 'left') {
                 var parentHeight = this.parent.clientHeight + 10;
                 this.parent.style.left = position_meta.x + 'px';
@@ -875,6 +876,17 @@ var Gantt = (function (exports) {
                 this.pointer.style.left = '-7px';
                 this.pointer.style.top = '2px';
             }
+            else if (options.position === 'middle') {
+                var parentHeight = this.parent.clientHeight + 10;
+                this.parent.style.left = position_meta.x + position_meta.width / 2 - this.parent.clientWidth / 2 + 'px';
+                if (position_meta.y < parentHeight) {
+                    this.parent.style.top = position_meta.y + 50 + 'px';
+                }
+                else {
+                    this.parent.style.top = position_meta.y - parentHeight + 'px';
+                }
+            }
+            // FIXME ends here
             // show
             this.parent.style.opacity = 1;
         };
