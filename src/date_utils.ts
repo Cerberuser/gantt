@@ -2,7 +2,7 @@
 // tslint:disable:class-name
 // tslint:disable:object-literal-sort-keys
 
-import { unreachable } from './type-utils';
+import { unreachable } from 'unreachable-ts';
 
 const YEAR = 'year';
 const MONTH = 'month';
@@ -87,7 +87,7 @@ class date_utils {
 
             return new Date(...(vals as DateInput));
         }
-        return unreachable<typeof date>(new Error('Parse function received an unexpected object'));
+        return unreachable(date, 'Parse function received an unexpected object');
     }
 
     public to_string(date: Date, with_time = false) {

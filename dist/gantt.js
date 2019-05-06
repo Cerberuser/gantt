@@ -1,4 +1,4 @@
-var Gantt = (function (exports) {
+var Gantt = (function (exports, unreachableTs) {
     'use strict';
 
     /*! *****************************************************************************
@@ -213,10 +213,6 @@ var Gantt = (function (exports) {
         return Arrow;
     }());
 
-    function unreachable(errorValue) {
-        throw errorValue;
-    }
-
     // tslint:disable:variable-name
     var YEAR = 'year';
     var MONTH = 'month';
@@ -296,7 +292,7 @@ var Gantt = (function (exports) {
                 }
                 return new (Date.bind.apply(Date, [void 0].concat(vals)))();
             }
-            return unreachable(new Error('Parse function received an unexpected object'));
+            return unreachableTs.unreachable(date, 'Parse function received an unexpected object');
         };
         date_utils.prototype.to_string = function (date, with_time) {
             if (with_time === void 0) { with_time = false; }
@@ -1759,4 +1755,4 @@ var Gantt = (function (exports) {
 
     return exports;
 
-}({}));
+}({}, unreachableTs));
