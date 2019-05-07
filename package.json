@@ -34,7 +34,7 @@
     },
     "homepage": "https://github.com/cerberuser/typescript-gantt",
     "dependencies": {
-        "unreachable-ts": "0.2.4"
+        "unreachable-ts": "2.0.0-alpha.1"
     },
     "devDependencies": {
         "@types/jest": "24.0.11",
