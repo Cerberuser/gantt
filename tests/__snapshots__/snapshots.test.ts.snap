@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Gantt renderer should render empty chart 1`] = `
+<div
+  id="container"
+>
+  <div
+    class="gantt-container"
+  >
+    <svg
+      class="gantt"
+    />
+    <div
+      class="popup-wrapper"
+    />
+  </div>
+</div>
+`;
