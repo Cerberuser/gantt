@@ -29,6 +29,23 @@ var Gantt = (function (exports, unreachableTs) {
 
     // tslint:disable:forin
     // tslint:disable:object-literal-sort-keys
+    (function () {
+        SVGElement.prototype.getX = function () {
+            return +this.getAttribute('x');
+        };
+        SVGElement.prototype.getY = function () {
+            return +this.getAttribute('y');
+        };
+        SVGElement.prototype.getWidth = function () {
+            return +this.getAttribute('width');
+        };
+        SVGElement.prototype.getHeight = function () {
+            return +this.getAttribute('height');
+        };
+        SVGElement.prototype.getEndX = function () {
+            return this.getX() + this.getWidth();
+        };
+    })();
     var $ = function (expr, con) {
         return typeof expr === 'string' ? (con || document).querySelector(expr) : expr || null;
     };
@@ -493,6 +510,23 @@ var Gantt = (function (exports, unreachableTs) {
             this.draw();
             this.bind();
         }
+        Bar.prepare_helpers = function () {
+            SVGElement.prototype.getX = function () {
+                return +this.getAttribute('x');
+            };
+            SVGElement.prototype.getY = function () {
+                return +this.getAttribute('y');
+            };
+            SVGElement.prototype.getWidth = function () {
+                return +this.getAttribute('width');
+            };
+            SVGElement.prototype.getHeight = function () {
+                return +this.getAttribute('height');
+            };
+            SVGElement.prototype.getEndX = function () {
+                return this.getX() + this.getWidth();
+            };
+        };
         Bar.prototype.update_bar_position = function (_a) {
             var _this = this;
             var x = _a.x, width = _a.width;
@@ -567,7 +601,7 @@ var Gantt = (function (exports, unreachableTs) {
         };
         Bar.prototype.prepare = function () {
             this.prepare_values();
-            this.prepare_helpers();
+            Bar.prepare_helpers();
         };
         Bar.prototype.prepare_values = function () {
             this.invalid = this.task.invalid;
@@ -590,23 +624,6 @@ var Gantt = (function (exports, unreachableTs) {
                 class: 'handle-group',
                 append_to: this.group
             });
-        };
-        Bar.prototype.prepare_helpers = function () {
-            SVGElement.prototype.getX = function () {
-                return +this.getAttribute('x');
-            };
-            SVGElement.prototype.getY = function () {
-                return +this.getAttribute('y');
-            };
-            SVGElement.prototype.getWidth = function () {
-                return +this.getAttribute('width');
-            };
-            SVGElement.prototype.getHeight = function () {
-                return +this.getAttribute('height');
-            };
-            SVGElement.prototype.getEndX = function () {
-                return this.getX() + this.getWidth();
-            };
         };
         Bar.prototype.draw = function () {
             this.draw_bar();
@@ -738,6 +755,7 @@ var Gantt = (function (exports, unreachableTs) {
                 target_element: this.$bar,
                 title: this.task.name,
                 subtitle: subtitle,
+                position: 'middle',
                 task: this.task
             });
         };
@@ -763,7 +781,7 @@ var Gantt = (function (exports, unreachableTs) {
                 var diffDay = utils.diff(task_start, gantt_start, 'day');
                 x = (diffDay * column_width) / 30;
             }
-            return x;
+            return x + 150; // TODO: this looks like a hack
         };
         Bar.prototype.compute_y = function () {
             return (this.gantt.options.header_height +
@@ -1331,7 +1349,7 @@ var Gantt = (function (exports, unreachableTs) {
             });
         };
         Gantt.prototype.make_grid_ticks = function () {
-            var tick_x = 0;
+            var tick_x = 150; // padding
             var tick_y = this.options.header_height + this.options.padding / 2;
             var tick_height = (this.options.bar_height + this.options.padding) * this.tasks.length;
             for (var _i = 0, _a = this.dates; _i < _a.length; _i++) {
@@ -1366,7 +1384,8 @@ var Gantt = (function (exports, unreachableTs) {
             // highlight today's date
             if (this.view_is('Day')) {
                 var x = (utils.diff(utils.today(), this.gantt_start, 'hour') / this.options.step) *
-                    this.options.column_width;
+                    this.options.column_width +
+                    150; // left padding
                 var y = 0;
                 var width = this.options.column_width;
                 var height = (this.options.bar_height + this.options.padding) * this.tasks.length +
@@ -1410,12 +1429,11 @@ var Gantt = (function (exports, unreachableTs) {
         Gantt.prototype.get_dates_to_draw = function () {
             var _this = this;
             var last_date = null;
-            var dates = this.dates.map(function (date, i) {
+            return this.dates.map(function (date, i) {
                 var d = _this.get_date_info(date, last_date, i);
                 last_date = date;
                 return d;
             });
-            return dates;
         };
         Gantt.prototype.get_date_info = function (date, last_date, i) {
             if (!last_date) {
@@ -1536,8 +1554,8 @@ var Gantt = (function (exports, unreachableTs) {
                 return;
             }
             var hours_before_first_task = utils.diff(this.get_oldest_starting_date(), this.gantt_start, 'hour');
-            var scroll_pos = (hours_before_first_task / this.options.step) * this.options.column_width - this.options.column_width;
-            parent_element.scrollLeft = scroll_pos;
+            parent_element.scrollLeft =
+                (hours_before_first_task / this.options.step) * this.options.column_width - this.options.column_width;
         };
         Gantt.prototype.bind_grid_click = function () {
             var _this = this;

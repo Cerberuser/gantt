@@ -542,7 +542,7 @@ export class Gantt {
     }
 
     private make_grid_ticks() {
-        let tick_x = 0;
+        let tick_x = 150; // padding
         const tick_y = this.options!.header_height + this.options!.padding / 2;
         const tick_height = (this.options!.bar_height + this.options!.padding) * this.tasks!.length;
 
@@ -580,7 +580,8 @@ export class Gantt {
         if (this.view_is('Day')) {
             const x =
                 (date_utils.diff(date_utils.today(), this.gantt_start, 'hour') / this.options!.step) *
-                this.options!.column_width;
+                    this.options!.column_width +
+                150; // left padding
             const y = 0;
 
             const width = this.options!.column_width;
@@ -629,12 +630,11 @@ export class Gantt {
 
     private get_dates_to_draw() {
         let last_date: Date | null = null;
-        const dates = this.dates!.map((date, i) => {
+        return this.dates!.map((date, i) => {
             const d = this.get_date_info(date, last_date!, i);
             last_date = date;
             return d;
         });
-        return dates;
     }
 
     private get_date_info(date: Date, last_date: Date, i: number) {
@@ -764,10 +764,8 @@ export class Gantt {
 
         const hours_before_first_task = date_utils.diff(this.get_oldest_starting_date(), this.gantt_start, 'hour');
 
-        const scroll_pos =
+        parent_element.scrollLeft =
             (hours_before_first_task / this.options!.step) * this.options!.column_width - this.options!.column_width;
-
-        parent_element.scrollLeft = scroll_pos;
     }
 
     private bind_grid_click() {

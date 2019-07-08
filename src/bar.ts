@@ -6,22 +6,25 @@ import date_utils from './date_utils';
 import { Gantt, ITaskInternal } from './index';
 import { $, animateSVG, createSVG } from './svg_utils';
 
-declare global {
-    // tslint:disable-next-line:interface-name
-    interface SVGElement {
-        getX(): number;
-
-        getY(): number;
-
-        getWidth(): number;
-
-        getHeight(): number;
-
-        getEndX(): number;
-    }
-}
-
 export default class Bar {
+    private static prepare_helpers() {
+        (SVGElement as any).prototype.getX = function() {
+            return +this.getAttribute('x');
+        };
+        (SVGElement as any).prototype.getY = function() {
+            return +this.getAttribute('y');
+        };
+        (SVGElement as any).prototype.getWidth = function() {
+            return +this.getAttribute('width');
+        };
+        (SVGElement as any).prototype.getHeight = function() {
+            return +this.getAttribute('height');
+        };
+        (SVGElement as any).prototype.getEndX = function() {
+            return this.getX() + this.getWidth();
+        };
+    }
+
     public group: SVGElement | null = null;
     public $bar: SVGGraphicsElement | null = null;
     public task: ITaskInternal | null = null;
@@ -132,7 +135,7 @@ export default class Bar {
 
     private prepare() {
         this.prepare_values();
-        this.prepare_helpers();
+        Bar.prepare_helpers();
     }
 
     private prepare_values() {
@@ -156,24 +159,6 @@ export default class Bar {
             class: 'handle-group',
             append_to: this.group
         });
-    }
-
-    private prepare_helpers() {
-        (SVGElement as any).prototype.getX = function() {
-            return +this.getAttribute('x');
-        };
-        (SVGElement as any).prototype.getY = function() {
-            return +this.getAttribute('y');
-        };
-        (SVGElement as any).prototype.getWidth = function() {
-            return +this.getAttribute('width');
-        };
-        (SVGElement as any).prototype.getHeight = function() {
-            return +this.getAttribute('height');
-        };
-        (SVGElement as any).prototype.getEndX = function() {
-            return this.getX() + this.getWidth();
-        };
     }
 
     private draw() {
@@ -324,6 +309,7 @@ export default class Bar {
             target_element: this.$bar!,
             title: this.task!.name,
             subtitle,
+            position: 'middle',
             task: this.task!
         });
     }
@@ -355,7 +341,7 @@ export default class Bar {
             const diffDay = date_utils.diff(task_start, gantt_start, 'day');
             x = (diffDay * column_width) / 30;
         }
-        return x;
+        return x + 150; // TODO: this looks like a hack
     }
 
     private compute_y() {
