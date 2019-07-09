@@ -1,3 +1,5 @@
+// tslint:disable:object-literal-sort-keys
+
 import { Gantt, IOptions, ITask } from '../src';
 
 function render(tasks: ITask[], options: Partial<IOptions>) {
@@ -12,5 +14,19 @@ function render(tasks: ITask[], options: Partial<IOptions>) {
 describe('Gantt renderer', () => {
     it('should render empty chart', () => {
         render([], {});
+    });
+
+    it('should render chart with one task', () => {
+        render(
+            [
+                {
+                    id: 'id1',
+                    name: 'name1',
+                    start: '2019-01-01',
+                    end: '2019-12-31'
+                }
+            ],
+            {}
+        );
     });
 });

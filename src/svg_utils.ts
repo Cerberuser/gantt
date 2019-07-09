@@ -1,38 +1,6 @@
 // tslint:disable:forin
 // tslint:disable:object-literal-sort-keys
 
-declare global {
-    // tslint:disable-next-line:interface-name
-    interface SVGElement {
-        getX(): number;
-
-        getY(): number;
-
-        getWidth(): number;
-
-        getHeight(): number;
-
-        getEndX(): number;
-    }
-}
-(() => {
-    (SVGElement as any).prototype.getX = function() {
-        return +this.getAttribute('x');
-    };
-    (SVGElement as any).prototype.getY = function() {
-        return +this.getAttribute('y');
-    };
-    (SVGElement as any).prototype.getWidth = function() {
-        return +this.getAttribute('width');
-    };
-    (SVGElement as any).prototype.getHeight = function() {
-        return +this.getAttribute('height');
-    };
-    (SVGElement as any).prototype.getEndX = function() {
-        return this.getX() + this.getWidth();
-    };
-})();
-
 interface SVGUtils {
     (expr: string | Element, con?: Element): Element | null;
 

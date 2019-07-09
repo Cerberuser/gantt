@@ -1,4 +1,4 @@
-var Gantt = (function (exports, unreachableTs) {
+var Gantt = (function (exports) {
     'use strict';
 
     /*! *****************************************************************************
@@ -29,23 +29,6 @@ var Gantt = (function (exports, unreachableTs) {
 
     // tslint:disable:forin
     // tslint:disable:object-literal-sort-keys
-    (function () {
-        SVGElement.prototype.getX = function () {
-            return +this.getAttribute('x');
-        };
-        SVGElement.prototype.getY = function () {
-            return +this.getAttribute('y');
-        };
-        SVGElement.prototype.getWidth = function () {
-            return +this.getAttribute('width');
-        };
-        SVGElement.prototype.getHeight = function () {
-            return +this.getAttribute('height');
-        };
-        SVGElement.prototype.getEndX = function () {
-            return this.getX() + this.getWidth();
-        };
-    })();
     var $ = function (expr, con) {
         return typeof expr === 'string' ? (con || document).querySelector(expr) : expr || null;
     };
@@ -230,6 +213,54 @@ var Gantt = (function (exports, unreachableTs) {
         return Arrow;
     }());
 
+    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+    function unwrapExports (x) {
+    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+    }
+
+    function createCommonjsModule(fn, module) {
+    	return module = { exports: {} }, fn(module, module.exports), module.exports;
+    }
+
+    var dist = createCommonjsModule(function (module, exports) {
+    var __extends = (commonjsGlobal && commonjsGlobal.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UnreachableError = /** @class */ (function (_super) {
+        __extends(UnreachableError, _super);
+        function UnreachableError(message) {
+            var _newTarget = this.constructor;
+            var _this = _super.call(this, message) || this;
+            Object.setPrototypeOf(_this, _newTarget.prototype);
+            return _this;
+        }
+        return UnreachableError;
+    }(Error));
+    exports.UnreachableError = UnreachableError;
+    function unreachable(checkedValue, message) {
+        throw (message
+            ? new UnreachableError(message)
+            : new TypeError("Unexpected value: " + JSON.stringify(checkedValue)));
+    }
+    exports.unreachable = unreachable;
+    });
+
+    unwrapExports(dist);
+    var dist_1 = dist.UnreachableError;
+    var dist_2 = dist.unreachable;
+
     // tslint:disable:variable-name
     var YEAR = 'year';
     var MONTH = 'month';
@@ -309,7 +340,7 @@ var Gantt = (function (exports, unreachableTs) {
                 }
                 return new (Date.bind.apply(Date, [void 0].concat(vals)))();
             }
-            return unreachableTs.unreachable(date, 'Parse function received an unexpected object');
+            return dist_2(date, 'Parse function received an unexpected object');
         };
         date_utils.prototype.to_string = function (date, with_time) {
             if (with_time === void 0) { with_time = false; }
@@ -916,6 +947,24 @@ var Gantt = (function (exports, unreachableTs) {
         };
         return Popup;
     }());
+
+    (function () {
+        SVGElement.prototype.getX = function () {
+            return +this.getAttribute('x');
+        };
+        SVGElement.prototype.getY = function () {
+            return +this.getAttribute('y');
+        };
+        SVGElement.prototype.getWidth = function () {
+            return +this.getAttribute('width');
+        };
+        SVGElement.prototype.getHeight = function () {
+            return +this.getAttribute('height');
+        };
+        SVGElement.prototype.getEndX = function () {
+            return this.getX() + this.getWidth();
+        };
+    })();
 
     // tslint:disable:variable-name
     var colors = [
@@ -1773,4 +1822,4 @@ var Gantt = (function (exports, unreachableTs) {
 
     return exports;
 
-}({}, unreachableTs));
+}({}));

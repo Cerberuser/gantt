@@ -8,6 +8,7 @@ import Popup, { IPopupOptions } from './popup';
 import { $, createSVG } from './svg_utils';
 
 import './gantt.less';
+import './patches';
 
 export interface ITask {
     id: string;

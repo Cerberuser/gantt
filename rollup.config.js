@@ -2,16 +2,23 @@ import less from 'rollup-plugin-less';
 import { uglify } from 'rollup-plugin-uglify';
 import merge from 'deepmerge';
 import typescript from 'rollup-plugin-typescript2';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 
 const dev = {
     input: 'src/index.ts',
     output: {
         name: 'Gantt',
         file: 'dist/gantt.js',
-        format: 'iife'
+        format: 'iife',
+        sourceMap: true
     },
     plugins: [
-        typescript(),
+        resolve(),
+        commonjs(),
+        typescript({
+            tsconfigOverride: { compilerOptions: { rootDir: 'src' }, exclude: ['**/*.test.ts'] }
+        }),
         less({
             output: 'dist/gantt.css'
         })
@@ -19,9 +26,17 @@ const dev = {
 };
 const prod = merge(dev, {
     output: {
-        file: 'dist/gantt.min.js'
+        file: 'dist/gantt.min.js',
+        sourceMap: false
     },
     plugins: [uglify()]
 });
 
-export default [dev, prod];
+const es6 = merge(dev, {
+    output: {
+        file: 'dist/gantt-es6.js',
+        format: 'esm'
+    }
+});
+
+export default [dev, prod, es6];
