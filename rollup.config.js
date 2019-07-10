@@ -11,7 +11,7 @@ const dev = {
         name: 'Gantt',
         file: 'dist/gantt.js',
         format: 'iife',
-        sourceMap: true
+        sourcemap: true
     },
     plugins: [
         resolve(),
@@ -26,8 +26,7 @@ const dev = {
 };
 const prod = merge(dev, {
     output: {
-        file: 'dist/gantt.min.js',
-        sourceMap: false
+        file: 'dist/gantt.min.js'
     },
     plugins: [uglify()]
 });

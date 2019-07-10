@@ -1816,3 +1816,4 @@ function generate_id(task) {
 }
 
 export { Gantt };
+//# sourceMappingURL=gantt-es6.js.map
