@@ -4,6 +4,7 @@
     "description": "A simple, modern, interactive gantt library for the web",
     "main": "src/index.ts",
     "module": "dist/gantt-es6.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "check": "tslint --fix --project .",
         "start": "yarn run dev",

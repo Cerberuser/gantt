@@ -1,5 +1,915 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Gantt renderer should render chart with one task 1`] = `
+<div
+  id="container"
+>
+  <div
+    class="gantt-container"
+  >
+    <svg
+      class="gantt"
+      height="106"
+      width="2470"
+    >
+      <g
+        class="grid"
+      >
+        <rect
+          class="grid-background"
+          height="106"
+          width="2620"
+          x="0"
+          y="0"
+        />
+        <g>
+          <rect
+            class="grid-row"
+            height="38"
+            style="fill: #b7d95f;"
+            width="2470"
+            x="150"
+            y="59"
+          />
+        </g>
+        <g>
+          <line
+            class="grid-row-line"
+            style="stroke: #b7d95f;"
+            x1="150"
+            x2="2470"
+            y1="97"
+            y2="97"
+          />
+        </g>
+        <rect
+          class="grid-header"
+          height="60"
+          width="2620"
+          x="0"
+          y="0"
+        />
+        <path
+          class="tick thick"
+          d="M 150 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 188 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 226 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 264 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 302 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 340 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 378 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 416 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 454 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 492 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 530 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 568 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 606 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 644 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 682 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 720 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 758 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 796 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 834 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 872 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 910 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 948 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 986 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1024 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1062 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1100 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1138 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1176 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1214 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1252 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1290 59 v 38"
+        />
+        <path
+          class="tick thick"
+          d="M 1328 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1366 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1404 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1442 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1480 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1518 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1556 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1594 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1632 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1670 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1708 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1746 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1784 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1822 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1860 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1898 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1936 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 1974 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2012 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2050 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2088 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2126 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2164 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2202 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2240 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2278 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2316 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2354 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2392 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2430 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2468 59 v 38"
+        />
+        <path
+          class="tick thick"
+          d="M 2506 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2544 59 v 38"
+        />
+        <path
+          class="tick"
+          d="M 2582 59 v 38"
+        />
+        <rect
+          class="today-highlight"
+          height="97"
+          width="38"
+          x="8548"
+          y="0"
+        />
+        <rect
+          fill="#b7d95f"
+          height="38"
+          width="150"
+          x="0"
+          y="60"
+        />
+        <foreignobject
+          height="38"
+          width="150"
+          x="0"
+          y="60"
+        >
+          <div
+            class="legend"
+          >
+            <span />
+          </div>
+        </foreignobject>
+      </g>
+      <g
+        class="date"
+      >
+        <text
+          class="lower-text"
+          x="169"
+          y="50"
+        />
+        <text
+          class="lower-text"
+          x="207"
+          y="50"
+        >
+          02
+        </text>
+        <text
+          class="lower-text"
+          x="245"
+          y="50"
+        >
+          03
+        </text>
+        <text
+          class="lower-text"
+          x="283"
+          y="50"
+        >
+          04
+        </text>
+        <text
+          class="lower-text"
+          x="321"
+          y="50"
+        >
+          05
+        </text>
+        <text
+          class="lower-text"
+          x="359"
+          y="50"
+        >
+          06
+        </text>
+        <text
+          class="lower-text"
+          x="397"
+          y="50"
+        >
+          07
+        </text>
+        <text
+          class="lower-text"
+          x="435"
+          y="50"
+        >
+          08
+        </text>
+        <text
+          class="lower-text"
+          x="473"
+          y="50"
+        >
+          09
+        </text>
+        <text
+          class="lower-text"
+          x="511"
+          y="50"
+        >
+          10
+        </text>
+        <text
+          class="lower-text"
+          x="549"
+          y="50"
+        >
+          11
+        </text>
+        <text
+          class="lower-text"
+          x="587"
+          y="50"
+        >
+          12
+        </text>
+        <text
+          class="lower-text"
+          x="625"
+          y="50"
+        >
+          13
+        </text>
+        <text
+          class="lower-text"
+          x="663"
+          y="50"
+        >
+          14
+        </text>
+        <text
+          class="lower-text"
+          x="701"
+          y="50"
+        >
+          15
+        </text>
+        <text
+          class="lower-text"
+          x="739"
+          y="50"
+        >
+          16
+        </text>
+        <text
+          class="lower-text"
+          x="777"
+          y="50"
+        >
+          17
+        </text>
+        <text
+          class="lower-text"
+          x="815"
+          y="50"
+        >
+          18
+        </text>
+        <text
+          class="lower-text"
+          x="853"
+          y="50"
+        >
+          19
+        </text>
+        <text
+          class="lower-text"
+          x="891"
+          y="50"
+        >
+          20
+        </text>
+        <text
+          class="lower-text"
+          x="929"
+          y="50"
+        >
+          21
+        </text>
+        <text
+          class="lower-text"
+          x="967"
+          y="50"
+        >
+          22
+        </text>
+        <text
+          class="lower-text"
+          x="1005"
+          y="50"
+        >
+          23
+        </text>
+        <text
+          class="lower-text"
+          x="1043"
+          y="50"
+        >
+          24
+        </text>
+        <text
+          class="lower-text"
+          x="1081"
+          y="50"
+        >
+          25
+        </text>
+        <text
+          class="lower-text"
+          x="1119"
+          y="50"
+        >
+          26
+        </text>
+        <text
+          class="lower-text"
+          x="1157"
+          y="50"
+        >
+          27
+        </text>
+        <text
+          class="lower-text"
+          x="1195"
+          y="50"
+        >
+          28
+        </text>
+        <text
+          class="lower-text"
+          x="1233"
+          y="50"
+        >
+          29
+        </text>
+        <text
+          class="lower-text"
+          x="1271"
+          y="50"
+        >
+          30
+        </text>
+        <text
+          class="lower-text"
+          x="1309"
+          y="50"
+        >
+          31
+        </text>
+        <text
+          class="lower-text"
+          x="1347"
+          y="50"
+        >
+          01
+        </text>
+        <text
+          class="upper-text"
+          x="1748"
+          y="25"
+        >
+          January
+        </text>
+        <text
+          class="lower-text"
+          x="1385"
+          y="50"
+        >
+          02
+        </text>
+        <text
+          class="lower-text"
+          x="1423"
+          y="50"
+        >
+          03
+        </text>
+        <text
+          class="lower-text"
+          x="1461"
+          y="50"
+        >
+          04
+        </text>
+        <text
+          class="lower-text"
+          x="1499"
+          y="50"
+        >
+          05
+        </text>
+        <text
+          class="lower-text"
+          x="1537"
+          y="50"
+        >
+          06
+        </text>
+        <text
+          class="lower-text"
+          x="1575"
+          y="50"
+        >
+          07
+        </text>
+        <text
+          class="lower-text"
+          x="1613"
+          y="50"
+        >
+          08
+        </text>
+        <text
+          class="lower-text"
+          x="1651"
+          y="50"
+        >
+          09
+        </text>
+        <text
+          class="lower-text"
+          x="1689"
+          y="50"
+        >
+          10
+        </text>
+        <text
+          class="lower-text"
+          x="1727"
+          y="50"
+        >
+          11
+        </text>
+        <text
+          class="lower-text"
+          x="1765"
+          y="50"
+        >
+          12
+        </text>
+        <text
+          class="lower-text"
+          x="1803"
+          y="50"
+        >
+          13
+        </text>
+        <text
+          class="lower-text"
+          x="1841"
+          y="50"
+        >
+          14
+        </text>
+        <text
+          class="lower-text"
+          x="1879"
+          y="50"
+        >
+          15
+        </text>
+        <text
+          class="lower-text"
+          x="1917"
+          y="50"
+        >
+          16
+        </text>
+        <text
+          class="lower-text"
+          x="1955"
+          y="50"
+        >
+          17
+        </text>
+        <text
+          class="lower-text"
+          x="1993"
+          y="50"
+        >
+          18
+        </text>
+        <text
+          class="lower-text"
+          x="2031"
+          y="50"
+        >
+          19
+        </text>
+        <text
+          class="lower-text"
+          x="2069"
+          y="50"
+        >
+          20
+        </text>
+        <text
+          class="lower-text"
+          x="2107"
+          y="50"
+        >
+          21
+        </text>
+        <text
+          class="lower-text"
+          x="2145"
+          y="50"
+        >
+          22
+        </text>
+        <text
+          class="lower-text"
+          x="2183"
+          y="50"
+        >
+          23
+        </text>
+        <text
+          class="lower-text"
+          x="2221"
+          y="50"
+        >
+          24
+        </text>
+        <text
+          class="lower-text"
+          x="2259"
+          y="50"
+        >
+          25
+        </text>
+        <text
+          class="lower-text"
+          x="2297"
+          y="50"
+        >
+          26
+        </text>
+        <text
+          class="lower-text"
+          x="2335"
+          y="50"
+        >
+          27
+        </text>
+        <text
+          class="lower-text"
+          x="2373"
+          y="50"
+        >
+          28
+        </text>
+        <text
+          class="lower-text"
+          x="2411"
+          y="50"
+        >
+          29
+        </text>
+        <text
+          class="lower-text"
+          x="2449"
+          y="50"
+        >
+          30
+        </text>
+        <text
+          class="lower-text"
+          x="2487"
+          y="50"
+        >
+          31
+        </text>
+        <text
+          class="lower-text"
+          x="2525"
+          y="50"
+        >
+          01
+        </text>
+        <text
+          class="upper-text"
+          x="2926"
+          y="25"
+        >
+          February
+        </text>
+        <text
+          class="lower-text"
+          x="2563"
+          y="50"
+        >
+          02
+        </text>
+        <text
+          class="lower-text"
+          x="2601"
+          y="50"
+        >
+          03
+        </text>
+      </g>
+      <g
+        class="arrow"
+      />
+      <g
+        class="progress"
+      />
+      <g
+        class="bar"
+      >
+        <g
+          class="bar-wrapper "
+          data-id="id1"
+        >
+          <g
+            class="bar-group"
+          >
+            <rect
+              class="bar"
+              height="20"
+              rx="3"
+              ry="3"
+              style="fill: #b7d95f;"
+              width="76"
+              x="1328"
+              y="68"
+            >
+              <animate
+                attributeName="width"
+                begin="0.1s"
+                calcMode="spline"
+                dur="0.4s"
+                from="0"
+                keySplines="0 0 .58 1"
+                keyTimes="0; 1"
+                to="76"
+                values="0;76"
+              />
+            </rect>
+            <rect
+              class="bar-progress"
+              height="20"
+              rx="3"
+              ry="3"
+              style="fill: #b7d95f;"
+              width="0"
+              x="1328"
+              y="68"
+            >
+              <animate
+                attributeName="width"
+                begin="0.1s"
+                calcMode="spline"
+                dur="0.4s"
+                from="0"
+                keySplines="0 0 .58 1"
+                keyTimes="0; 1"
+                to="0"
+                values="0;0"
+              />
+            </rect>
+            <text
+              class="bar-label"
+              x="1366"
+              y="78"
+            >
+              name1
+            </text>
+          </g>
+          <g
+            class="handle-group"
+          >
+            <rect
+              class="handle right"
+              height="18"
+              rx="3"
+              ry="3"
+              width="8"
+              x="1395"
+              y="69"
+            />
+            <rect
+              class="handle left"
+              height="18"
+              rx="3"
+              ry="3"
+              width="8"
+              x="1329"
+              y="69"
+            />
+          </g>
+        </g>
+      </g>
+      <g
+        class="details"
+      />
+    </svg>
+    <div
+      class="popup-wrapper"
+    />
+  </div>
+</div>
+`;
+
 exports[`Gantt renderer should render empty chart 1`] = `
 <div
   id="container"
